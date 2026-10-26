@@ -27,7 +27,9 @@ docker-compose.yml
 
 ## Getting started
 
-Copy `.env.example` to `.env` and set `JWT_SECRET` (32+ characters). `.env` is git-ignored.
+For a full step-by-step guide to running this on a new computer, see [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md).
+
+Quick version: copy `.env.example` to `.env` and set `JWT_SECRET` (32+ characters). `.env` is git-ignored.
 
 ### Database and backend (Docker)
 
@@ -68,11 +70,13 @@ npx cap sync
 
 Done: monorepo skeleton, Flyway schema and seed data, register/login/refresh and `GET/PATCH /users/me` with JWT, ingredient search, day themes, pantry CRUD (single, bulk, expiring), recipe history/detail/delete, favorites, and the matching screens (login, register, pantry with editing, recipes, recipe detail, profile) with session restore, CI.
 
-Phase 2 (in progress): expense categories (defaults created per user), expenses with quick-add, monthly summary with a daily chart, per-category monthly budgets with OK / near / over status, and the Spending and Budgets screens. Not started yet: shopping list, Android SMS parsing, budget alert job.
+Phase 2: expense categories (defaults created per user), expenses with quick-add, a bank-SMS paste parser, monthly summary with a daily chart, per-category monthly budgets with OK / near / over status, a shopping list (including a recipe's missing ingredients), and the Spending, Budgets and Shopping screens. Still to do: automatic SMS reading on Android (Capacitor plugin) and the budget alert job.
+
+Phase 3 (started): tasks with due dates and a Tasks tab. Still to do: push reminders, recurring tasks, Account Aggregator sandbox demo.
 
 On hold: the AI provider integration (`POST /recipes/suggest`, prompt builder, validator). Recipes are read from the database, so this plugs in without changing the existing endpoints.
 
-Next: Phase 2 (expenses, budgets, charts, shopping list).
+Next: reminders for tasks, the Android SMS reader, then the AI suggestions when you are ready.
 
 ## Running the tests
 
