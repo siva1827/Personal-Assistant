@@ -1,6 +1,8 @@
 services:
   mysql:
     image: mysql:8.4
+    # Emoji (category icons) need 4-byte UTF-8
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
     environment:
       MYSQL_DATABASE: assistant
       MYSQL_USER: ${DB_USER:-assistant}
