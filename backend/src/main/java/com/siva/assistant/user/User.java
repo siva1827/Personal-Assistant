@@ -1,6 +1,8 @@
 package com.siva.assistant.user;
 
+import com.siva.assistant.common.StringListJsonConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,8 +14,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "users")
@@ -36,7 +36,7 @@ public class User {
     @Column(name = "dietary_preference", nullable = false)
     private DietaryPreference dietaryPreference = DietaryPreference.ANY;
 
-    @JdbcTypeCode(SqlTypes.JSON)
+    @Convert(converter = StringListJsonConverter.class)
     @Column(columnDefinition = "json")
     private List<String> allergies = new ArrayList<>();
 

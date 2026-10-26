@@ -11,8 +11,13 @@ export default function HomePage() {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <p>Pantry, themes and recipe suggestions arrive in Phase 1.</p>
-        <IonButton onClick={logout}>Sign out</IonButton>
+        <IonButton expand="block" routerLink="/pantry">
+          My pantry
+        </IonButton>
+        <p>Day themes and AI recipe suggestions arrive next.</p>
+        <IonButton fill="outline" onClick={logout}>
+          Sign out
+        </IonButton>
       </IonContent>
     </IonPage>
   )

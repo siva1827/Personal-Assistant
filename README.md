@@ -66,6 +66,13 @@ npx cap sync
 
 ## Status
 
-Done: monorepo skeleton, Flyway schema and seed data, register/login/refresh and `GET/PATCH /users/me` with JWT, login and register screens, CI.
+Done: monorepo skeleton, Flyway schema and seed data, register/login/refresh and `GET/PATCH /users/me` with JWT, ingredient search, day themes, pantry CRUD (single, bulk, expiring), login/register/pantry screens with session restore, CI.
 
-Next: ingredients and pantry endpoints, then the AI package and `/recipes/suggest`.
+Next: the AI package and `POST /recipes/suggest`, then favorites.
+
+## Running the tests
+
+```bash
+cd backend && mvn verify      # unit tests
+cd frontend && npm test       # Vitest
+```

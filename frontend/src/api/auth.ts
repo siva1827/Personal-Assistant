@@ -7,4 +7,7 @@ export const login = (email: string, password: string) =>
 export const register = (email: string, password: string, displayName: string) =>
   api.post<AuthResponse>('/auth/register', { email, password, displayName }).then((r) => r.data)
 
+export const refresh = (refreshToken: string) =>
+  api.post<AuthResponse>('/auth/refresh', { refreshToken }).then((r) => r.data)
+
 export const getMe = () => api.get<UserProfile>('/users/me').then((r) => r.data)
