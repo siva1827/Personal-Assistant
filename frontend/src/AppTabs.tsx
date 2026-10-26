@@ -1,6 +1,8 @@
 import { IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from '@ionic/react'
-import { homeOutline, nutritionOutline, personOutline, restaurantOutline } from 'ionicons/icons'
+import { cashOutline, homeOutline, nutritionOutline, personOutline, restaurantOutline } from 'ionicons/icons'
 import { Navigate, Route } from 'react-router-dom'
+import BudgetsPage from './pages/BudgetsPage'
+import ExpensesPage from './pages/ExpensesPage'
 import HomePage from './pages/HomePage'
 import PantryPage from './pages/PantryPage'
 import ProfilePage from './pages/ProfilePage'
@@ -15,6 +17,8 @@ export default function AppTabs() {
         <Route path="/pantry" element={<PantryPage />} />
         <Route path="/recipes" element={<RecipesPage />} />
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />
+        <Route path="/expenses" element={<ExpensesPage />} />
+        <Route path="/budgets" element={<BudgetsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/" element={<Navigate to="/home" replace />} />
       </IonRouterOutlet>
@@ -30,6 +34,10 @@ export default function AppTabs() {
         <IonTabButton tab="recipes" href="/recipes">
           <IonIcon icon={restaurantOutline} />
           <IonLabel>Recipes</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="expenses" href="/expenses">
+          <IonIcon icon={cashOutline} />
+          <IonLabel>Spending</IonLabel>
         </IonTabButton>
         <IonTabButton tab="profile" href="/profile">
           <IonIcon icon={personOutline} />

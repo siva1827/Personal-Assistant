@@ -68,6 +68,8 @@ npx cap sync
 
 Done: monorepo skeleton, Flyway schema and seed data, register/login/refresh and `GET/PATCH /users/me` with JWT, ingredient search, day themes, pantry CRUD (single, bulk, expiring), recipe history/detail/delete, favorites, and the matching screens (login, register, pantry with editing, recipes, recipe detail, profile) with session restore, CI.
 
+Phase 2 (in progress): expense categories (defaults created per user), expenses with quick-add, monthly summary with a daily chart, per-category monthly budgets with OK / near / over status, and the Spending and Budgets screens. Not started yet: shopping list, Android SMS parsing, budget alert job.
+
 On hold: the AI provider integration (`POST /recipes/suggest`, prompt builder, validator). Recipes are read from the database, so this plugs in without changing the existing endpoints.
 
 Next: Phase 2 (expenses, budgets, charts, shopping list).

@@ -280,3 +280,100 @@ ion-tab-bar {
 .bar.danger > span {
   background: var(--ion-color-danger);
 }
+
+/* Expenses */
+.month-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0 12px;
+}
+
+.month-switcher strong {
+  font-size: 17px;
+}
+
+.total-card .amount {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.daily-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 84px;
+  margin-top: 14px;
+}
+
+.daily-chart .col {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.daily-chart .col > span {
+  display: block;
+  width: 100%;
+  min-height: 3px;
+  border-radius: 4px 4px 2px 2px;
+  background: rgba(127, 140, 132, 0.28);
+}
+
+.daily-chart .col.has > span {
+  background: var(--ion-color-primary);
+}
+
+.daily-chart-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--app-muted);
+  margin-top: 4px;
+}
+
+.cat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 14px;
+}
+
+.cat-chip {
+  border: 1.5px solid rgba(127, 140, 132, 0.35);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 8px 13px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cat-chip.selected {
+  border-color: var(--ion-color-primary);
+  background: rgba(var(--ion-color-primary-rgb), 0.14);
+  color: var(--ion-color-primary-shade);
+}
+
+.amount-input input.native-input {
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--app-muted);
+  margin: 18px 4px 8px;
+}
+
+.money {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}

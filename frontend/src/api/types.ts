@@ -85,3 +85,58 @@ export interface Page<T> {
   totalElements: number
   totalPages: number
 }
+
+export interface Category {
+  id: number
+  name: string
+  emoji: string | null
+}
+
+export interface Expense {
+  id: number
+  categoryId: number
+  categoryName: string
+  categoryEmoji: string | null
+  amount: number
+  note: string | null
+  spentOn: string
+  source: 'MANUAL' | 'SMS' | 'BANK_SYNC'
+}
+
+export interface ExpenseRequest {
+  categoryId: number
+  amount: number
+  note?: string
+  spentOn?: string
+}
+
+export type BudgetStatus = 'OK' | 'NEAR' | 'OVER'
+
+export interface CategorySummary {
+  categoryId: number
+  name: string
+  emoji: string | null
+  total: number
+  budget: number | null
+  status: BudgetStatus | null
+}
+
+export interface DaySummary {
+  date: string
+  total: number
+}
+
+export interface MonthSummary {
+  month: string
+  total: number
+  byCategory: CategorySummary[]
+  byDay: DaySummary[]
+}
+
+export interface Budget {
+  categoryId: number
+  categoryName: string
+  categoryEmoji: string | null
+  month: string
+  limitAmount: number
+}
