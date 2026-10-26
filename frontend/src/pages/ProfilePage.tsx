@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import {
-  IonBackButton,
   IonButton,
-  IonButtons,
   IonContent,
   IonHeader,
   IonInput,
@@ -14,6 +12,7 @@ import {
   IonToolbar,
 } from '@ionic/react'
 import type { DietaryPreference, UserProfile } from '../api/types'
+import { useAuth } from '../auth/useAuth'
 import { parseAllergies, useProfile, useUpdateProfile } from '../features/profile/useProfile'
 
 const DIETS: { value: DietaryPreference; label: string }[] = [
@@ -34,10 +33,25 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
     update.mutate({ displayName: displayName.trim(), dietaryPreference: diet, allergies: parseAllergies(allergies) })
 
   return (
-    <>
-      <p>{profile.email}</p>
-      <IonInput label="Name" value={displayName} onIonInput={(e) => setDisplayName(String(e.detail.value ?? ''))} />
-      <IonSelect label="Diet" value={diet} onIonChange={(e) => setDiet(e.detail.value as DietaryPreference)}>
+    <div className="card">
+      <p className="muted" style={{ marginTop: 0 }}>
+        {profile.email}
+      </p>
+      <IonInput
+        label="Name"
+        labelPlacement="floating"
+        fill="outline"
+        value={displayName}
+        onIonInput={(e) => setDisplayName(String(e.detail.value ?? ''))}
+      />
+      <IonSelect
+        label="Diet"
+        labelPlacement="floating"
+        fill="outline"
+        style={{ marginTop: 14 }}
+        value={diet}
+        onIonChange={(e) => setDiet(e.detail.value as DietaryPreference)}
+      >
         {DIETS.map((d) => (
           <IonSelectOption key={d.value} value={d.value}>
             {d.label}
@@ -46,37 +60,52 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
       </IonSelect>
       <IonInput
         label="Allergies"
-        labelPlacement="stacked"
+        labelPlacement="floating"
+        fill="outline"
         placeholder="peanut, shellfish"
         helperText="Comma separated. Recipes containing these are filtered out."
+        style={{ marginTop: 14 }}
         value={allergies}
         onIonInput={(e) => setAllergies(String(e.detail.value ?? ''))}
       />
-      <IonButton expand="block" onClick={save} disabled={update.isPending}>
-        Save
+      <IonButton expand="block" style={{ marginTop: 16 }} onClick={save} disabled={update.isPending}>
+        Save changes
       </IonButton>
-      {update.isSuccess && <IonText color="success">Saved.</IonText>}
-      {update.isError && <IonText color="danger">Could not save changes.</IonText>}
-    </>
+      {update.isSuccess && (
+        <IonText color="success">
+          <p role="status" className="ion-text-center">Saved</p>
+        </IonText>
+      )}
+      {update.isError && (
+        <IonText color="danger">
+          <p role="alert" className="ion-text-center">Could not save changes</p>
+        </IonText>
+      )}
+    </div>
   )
 }
 
 export default function ProfilePage() {
   const profile = useProfile()
+  const { logout } = useAuth()
 
   return (
     <IonPage>
-      <IonHeader>
+      <IonHeader className="ion-no-border">
         <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/home" />
-          </IonButtons>
           <IonTitle>Profile</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
-        {profile.isError && <IonText color="danger">Could not load your profile.</IonText>}
+      <IonContent className="app-content">
+        {profile.isError && (
+          <div className="card">
+            <IonText color="danger">Could not load your profile.</IonText>
+          </div>
+        )}
         {profile.data && <ProfileForm profile={profile.data} />}
+        <IonButton expand="block" fill="outline" color="danger" onClick={logout}>
+          Sign out
+        </IonButton>
       </IonContent>
     </IonPage>
   )

@@ -1,26 +1,24 @@
 import { useState } from 'react'
 import {
   IonAlert,
-  IonBackButton,
-  IonBadge,
   IonButton,
-  IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
   IonItem,
   IonLabel,
-  IonList,
-  IonListHeader,
   IonPage,
   IonSearchbar,
   IonText,
   IonTitle,
   IonToolbar,
 } from '@ionic/react'
-import { addOutline, trashOutline } from 'ionicons/icons'
-import { isExpiringSoon } from '../features/pantry/expiry'
+import { addCircleOutline, trashOutline } from 'ionicons/icons'
 import type { PantryItem } from '../api/types'
+import { categoryEmoji } from '../components/categoryEmoji'
+import EmptyState from '../components/EmptyState'
+import ListSkeleton from '../components/ListSkeleton'
+import { daysUntil, isExpiringSoon } from '../features/pantry/expiry'
 import {
   useAddPantryItem,
   useDeletePantryItem,
@@ -28,6 +26,13 @@ import {
   usePantry,
   useUpdatePantryItem,
 } from '../features/pantry/usePantry'
+
+function expiryLabel(isoDate: string): string {
+  const days = daysUntil(isoDate)
+  if (days < 0) return 'expired'
+  if (days === 0) return 'expires today'
+  return `${days}d left`
+}
 
 export default function PantryPage() {
   const [query, setQuery] = useState('')
@@ -40,93 +45,89 @@ export default function PantryPage() {
 
   const inPantry = new Set(pantry.data?.map((p) => p.ingredientId))
   const suggestions = (search.data ?? []).filter((i) => !inPantry.has(i.id))
+  const searching = query.trim().length > 0
 
   return (
     <IonPage>
-      <IonHeader>
+      <IonHeader className="ion-no-border">
         <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/home" />
-          </IonButtons>
           <IonTitle>My pantry</IonTitle>
         </IonToolbar>
+        <IonToolbar>
+          <IonSearchbar
+            placeholder="Search ingredients to add"
+            value={query}
+            debounce={250}
+            onIonInput={(e) => setQuery(e.detail.value ?? '')}
+          />
+        </IonToolbar>
       </IonHeader>
-      <IonContent>
-        <IonSearchbar
-          placeholder="Search ingredients to add"
-          value={query}
-          debounce={250}
-          onIonInput={(e) => setQuery(e.detail.value ?? '')}
-        />
+      <IonContent className="app-content">
+        {searching && (
+          <>
+            <div className="section-title">Add to pantry</div>
+            {search.isSuccess && suggestions.length === 0 && (
+              <div className="card muted">No new ingredients match "{query.trim()}".</div>
+            )}
+            {suggestions.length > 0 && (
+              <div className="row-list">
+                {suggestions.map((ingredient) => (
+                  <IonItem key={ingredient.id} lines="full" button detail={false}
+                    onClick={() => add.mutate({ ingredientId: ingredient.id }, { onSuccess: () => setQuery('') })}>
+                    <span className="avatar">{categoryEmoji(ingredient.category)}</span>
+                    <IonLabel>
+                      {ingredient.name}
+                      {ingredient.category && <p>{ingredient.category}</p>}
+                    </IonLabel>
+                    <IonIcon slot="end" icon={addCircleOutline} color="primary" aria-label={`Add ${ingredient.name}`} />
+                  </IonItem>
+                ))}
+              </div>
+            )}
+            {add.isError && <IonText color="danger"><p>Could not add that ingredient.</p></IonText>}
+          </>
+        )}
 
-        {suggestions.length > 0 && (
-          <IonList>
-            {suggestions.map((ingredient) => (
-              <IonItem key={ingredient.id}>
+        <div className="section-title">In your pantry ({pantry.data?.length ?? 0})</div>
+        {pantry.isLoading && <ListSkeleton />}
+        {pantry.isError && <div className="card"><IonText color="danger">Could not load your pantry.</IonText></div>}
+        {pantry.data?.length === 0 && (
+          <EmptyState emoji="🧺" title="Your pantry is empty">
+            Search above and tap an ingredient to add it. The more you add, the better your recipes.
+          </EmptyState>
+        )}
+        {pantry.data && pantry.data.length > 0 && (
+          <div className="row-list">
+            {pantry.data.map((item) => (
+              <IonItem key={item.id} lines="full" button detail={false} onClick={() => setEditing(item)}>
+                <span className="avatar">{categoryEmoji(item.category)}</span>
                 <IonLabel>
-                  {ingredient.name}
-                  {ingredient.category && <p>{ingredient.category}</p>}
+                  {item.ingredientName}
+                  {(item.quantity !== null || item.unit) && (
+                    <p>{[item.quantity, item.unit].filter((v) => v !== null && v !== '').join(' ')}</p>
+                  )}
                 </IonLabel>
+                {item.expiryDate && (
+                  <span slot="end" className={`pill${isExpiringSoon(item.expiryDate) ? ' warn' : ''}`}>
+                    {expiryLabel(item.expiryDate)}
+                  </span>
+                )}
                 <IonButton
                   slot="end"
                   fill="clear"
-                  aria-label={`Add ${ingredient.name}`}
-                  onClick={() => add.mutate({ ingredientId: ingredient.id }, { onSuccess: () => setQuery('') })}
+                  color="danger"
+                  aria-label={`Remove ${item.ingredientName}`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    remove.mutate(item.id)
+                  }}
                 >
-                  <IonIcon slot="icon-only" icon={addOutline} />
+                  <IonIcon slot="icon-only" icon={trashOutline} />
                 </IonButton>
               </IonItem>
             ))}
-          </IonList>
+          </div>
         )}
-
-        {add.isError && (
-          <IonText color="danger">
-            <p className="ion-padding-horizontal">Could not add that ingredient.</p>
-          </IonText>
-        )}
-
-        <IonList>
-          <IonListHeader>
-            <IonLabel>In your pantry ({pantry.data?.length ?? 0})</IonLabel>
-          </IonListHeader>
-          {pantry.isError && (
-            <IonItem>
-              <IonText color="danger">Could not load your pantry.</IonText>
-            </IonItem>
-          )}
-          {pantry.data?.length === 0 && (
-            <IonItem>
-              <IonLabel color="medium">Nothing here yet. Search above to add ingredients.</IonLabel>
-            </IonItem>
-          )}
-          {pantry.data?.map((item) => (
-            <IonItem key={item.id}>
-              <IonLabel onClick={() => setEditing(item)} style={{ cursor: 'pointer' }}>
-                {item.ingredientName}
-                {(item.quantity !== null || item.unit) && (
-                  <p>
-                    {item.quantity ?? ''} {item.unit ?? ''}
-                  </p>
-                )}
-              </IonLabel>
-              {isExpiringSoon(item.expiryDate) && (
-                <IonBadge color="warning" slot="end">
-                  expiring {item.expiryDate}
-                </IonBadge>
-              )}
-              <IonButton
-                slot="end"
-                fill="clear"
-                color="danger"
-                aria-label={`Remove ${item.ingredientName}`}
-                onClick={() => remove.mutate(item.id)}
-              >
-                <IonIcon slot="icon-only" icon={trashOutline} />
-              </IonButton>
-            </IonItem>
-          ))}
-        </IonList>
 
         <IonAlert
           isOpen={editing !== null}

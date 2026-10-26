@@ -1,6 +1,5 @@
 import {
   IonBackButton,
-  IonBadge,
   IonButton,
   IonButtons,
   IonContent,
@@ -8,15 +7,14 @@ import {
   IonIcon,
   IonItem,
   IonLabel,
-  IonList,
-  IonListHeader,
   IonPage,
   IonText,
   IonTitle,
   IonToolbar,
 } from '@ionic/react'
-import { heart, heartOutline, trashOutline } from 'ionicons/icons'
+import { heart, heartOutline, peopleOutline, timeOutline, trashOutline } from 'ionicons/icons'
 import { useNavigate, useParams } from 'react-router-dom'
+import ListSkeleton from '../components/ListSkeleton'
 import { useDeleteRecipe, useRecipe, useToggleFavorite } from '../features/recipes/useRecipes'
 
 export default function RecipeDetailPage() {
@@ -30,7 +28,7 @@ export default function RecipeDetailPage() {
 
   return (
     <IonPage>
-      <IonHeader>
+      <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonButtons slot="start">
             <IonBackButton defaultHref="/recipes" />
@@ -55,67 +53,67 @@ export default function RecipeDetailPage() {
           )}
         </IonToolbar>
       </IonHeader>
-      <IonContent>
+      <IonContent className="app-content">
+        {recipe.isLoading && <ListSkeleton rows={5} />}
         {recipe.isError && (
-          <IonText color="danger">
-            <p className="ion-padding">Recipe not found.</p>
-          </IonText>
+          <div className="card">
+            <IonText color="danger">Recipe not found.</IonText>
+          </div>
         )}
         {data && (
           <>
-            <div className="ion-padding">
-              {data.description && <p>{data.description}</p>}
-              <p>
-                {[
-                  data.cookTimeMinutes ? `${data.cookTimeMinutes} min` : null,
-                  data.servings ? `serves ${data.servings}` : null,
-                  data.cuisine,
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </p>
+            <div className="card">
+              {data.description && <p style={{ marginTop: 0 }}>{data.description}</p>}
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }} className="muted">
+                {data.cookTimeMinutes && (
+                  <span>
+                    <IonIcon icon={timeOutline} style={{ verticalAlign: '-2px' }} /> {data.cookTimeMinutes} min
+                  </span>
+                )}
+                {data.servings && (
+                  <span>
+                    <IonIcon icon={peopleOutline} style={{ verticalAlign: '-2px' }} /> serves {data.servings}
+                  </span>
+                )}
+                {data.cuisine && <span>{data.cuisine}</span>}
+              </div>
             </div>
-            <IonList>
-              <IonListHeader>
-                <IonLabel>Ingredients</IonLabel>
-              </IonListHeader>
+
+            <div className="section-title">Ingredients</div>
+            <div className="row-list">
               {data.ingredients.map((ing) => (
-                <IonItem key={ing.name}>
+                <IonItem key={ing.name} lines="full">
                   <IonLabel>
                     {ing.name}
                     {(ing.quantity || ing.unit) && (
-                      <p>
-                        {ing.quantity ?? ''} {ing.unit ?? ''}
-                      </p>
+                      <p>{[ing.quantity, ing.unit].filter(Boolean).join(' ')}</p>
                     )}
                   </IonLabel>
                   {ing.in_pantry === false && (
-                    <IonBadge slot="end" color="warning">
-                      missing
-                    </IonBadge>
+                    <span slot="end" className="pill warn">
+                      need to buy
+                    </span>
+                  )}
+                  {ing.in_pantry === true && (
+                    <span slot="end" className="pill">
+                      in pantry
+                    </span>
                   )}
                 </IonItem>
               ))}
-              {data.missingIngredients.length > 0 && (
-                <IonItem lines="none">
-                  <IonLabel className="ion-text-wrap" color="medium">
-                    To buy: {data.missingIngredients.join(', ')}
-                  </IonLabel>
-                </IonItem>
-              )}
-            </IonList>
-            <IonList>
-              <IonListHeader>
-                <IonLabel>Steps</IonLabel>
-              </IonListHeader>
+            </div>
+
+            <div className="section-title">Steps</div>
+            <div className="row-list">
               {data.steps.map((step, index) => (
-                <IonItem key={index}>
-                  <IonLabel className="ion-text-wrap">
-                    {index + 1}. {step}
-                  </IonLabel>
+                <IonItem key={index} lines="full">
+                  <span className="avatar" style={{ fontSize: 16, fontWeight: 800 }}>
+                    {index + 1}
+                  </span>
+                  <IonLabel className="ion-text-wrap">{step}</IonLabel>
                 </IonItem>
               ))}
-            </IonList>
+            </div>
           </>
         )}
       </IonContent>
