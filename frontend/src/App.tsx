@@ -6,6 +6,9 @@ import RequireAuth from './auth/RequireAuth'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import PantryPage from './pages/PantryPage'
+import ProfilePage from './pages/ProfilePage'
+import RecipeDetailPage from './pages/RecipeDetailPage'
+import RecipesPage from './pages/RecipesPage'
 import RegisterPage from './pages/RegisterPage'
 
 setupIonicReact()
@@ -20,6 +23,9 @@ export default function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/home" element={<RequireAuth><HomePage /></RequireAuth>} />
             <Route path="/pantry" element={<RequireAuth><PantryPage /></RequireAuth>} />
+            <Route path="/recipes" element={<RequireAuth><RecipesPage /></RequireAuth>} />
+            <Route path="/recipes/:id" element={<RequireAuth><RecipeDetailPage /></RequireAuth>} />
+            <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
             <Route path="/" element={<Navigate to="/home" replace />} />
           </IonRouterOutlet>
         </IonReactRouter>

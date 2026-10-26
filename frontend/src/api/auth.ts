@@ -1,5 +1,5 @@
 import { api } from './client'
-import type { AuthResponse, UserProfile } from './types'
+import type { AuthResponse } from './types'
 
 export const login = (email: string, password: string) =>
   api.post<AuthResponse>('/auth/login', { email, password }).then((r) => r.data)
@@ -9,5 +9,3 @@ export const register = (email: string, password: string, displayName: string) =
 
 export const refresh = (refreshToken: string) =>
   api.post<AuthResponse>('/auth/refresh', { refreshToken }).then((r) => r.data)
-
-export const getMe = () => api.get<UserProfile>('/users/me').then((r) => r.data)

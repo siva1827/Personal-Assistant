@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react'
 import { IonSpinner } from '@ionic/react'
 import { Navigate } from 'react-router-dom'
-import { useAuth } from './AuthContext'
+import { useAuth } from './useAuth'
 
 export default function RequireAuth({ children }: { children: ReactElement }) {
   const { isAuthenticated, ready } = useAuth()

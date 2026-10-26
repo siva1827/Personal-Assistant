@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { IonButton, IonContent, IonHeader, IonInput, IonPage, IonText, IonTitle, IonToolbar } from '@ionic/react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/AuthContext'
+import { useAuth } from '../auth/useAuth'
 
 export default function LoginPage() {
   const { login } = useAuth()

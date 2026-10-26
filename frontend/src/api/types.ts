@@ -36,8 +36,52 @@ export interface AddPantryItemRequest {
   expiryDate?: string
 }
 
+export interface UpdatePantryItemRequest {
+  quantity?: number
+  unit?: string
+  expiryDate?: string
+}
+
 export interface DayTheme {
   id: number
   code: string
   label: string
+}
+
+export type DietaryPreference = UserProfile['dietaryPreference']
+
+export interface UpdateProfileRequest {
+  displayName?: string
+  dietaryPreference?: DietaryPreference
+  allergies?: string[]
+}
+
+export interface RecipeIngredient {
+  name: string
+  quantity?: number | string | null
+  unit?: string | null
+  in_pantry?: boolean
+}
+
+export interface Recipe {
+  id: number
+  title: string
+  description: string | null
+  cookTimeMinutes: number | null
+  servings: number | null
+  cuisine: string | null
+  dietaryType: DietaryPreference
+  ingredients: RecipeIngredient[]
+  missingIngredients: string[]
+  steps: string[]
+  favorite: boolean
+  createdAt: string
+}
+
+export interface Page<T> {
+  content: T[]
+  page: number
+  size: number
+  totalElements: number
+  totalPages: number
 }

@@ -66,9 +66,11 @@ npx cap sync
 
 ## Status
 
-Done: monorepo skeleton, Flyway schema and seed data, register/login/refresh and `GET/PATCH /users/me` with JWT, ingredient search, day themes, pantry CRUD (single, bulk, expiring), login/register/pantry screens with session restore, CI.
+Done: monorepo skeleton, Flyway schema and seed data, register/login/refresh and `GET/PATCH /users/me` with JWT, ingredient search, day themes, pantry CRUD (single, bulk, expiring), recipe history/detail/delete, favorites, and the matching screens (login, register, pantry with editing, recipes, recipe detail, profile) with session restore, CI.
 
-Next: the AI package and `POST /recipes/suggest`, then favorites.
+On hold: the AI provider integration (`POST /recipes/suggest`, prompt builder, validator). Recipes are read from the database, so this plugs in without changing the existing endpoints.
+
+Next: Phase 2 (expenses, budgets, charts, shopping list).
 
 ## Running the tests
 

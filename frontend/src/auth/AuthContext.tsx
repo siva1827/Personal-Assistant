@@ -1,19 +1,9 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Preferences } from '@capacitor/preferences'
 import { setAccessToken } from '../api/client'
 import * as authApi from '../api/auth'
 import type { AuthResponse } from '../api/types'
-
-interface AuthState {
-  isAuthenticated: boolean
-  /** False until the stored refresh token (if any) has been tried on startup. */
-  ready: boolean
-  login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, displayName: string) => Promise<void>
-  logout: () => Promise<void>
-}
-
-const AuthContext = createContext<AuthState | null>(null)
+import { AuthContext, type AuthState } from './context'
 
 const REFRESH_KEY = 'refreshToken'
 
@@ -64,10 +54,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider')
-  return ctx
 }
