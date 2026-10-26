@@ -377,3 +377,28 @@ ion-tab-bar {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
+
+/* Search field: clearly visible in light and dark mode */
+ion-searchbar.search-field {
+  --background: var(--app-card-bg);
+  --color: var(--ion-text-color);
+  --placeholder-color: var(--app-muted);
+  --placeholder-opacity: 1;
+  --icon-color: var(--ion-color-primary);
+  --clear-button-color: var(--app-muted);
+  --border-radius: 14px;
+  --box-shadow: none;
+  padding: 6px 12px 10px;
+}
+
+ion-searchbar.search-field .searchbar-input {
+  border: 1.5px solid rgba(var(--ion-color-primary-rgb), 0.35);
+  font-size: 16px;
+  font-weight: 500;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+ion-searchbar.search-field.searchbar-has-focus .searchbar-input {
+  border-color: var(--ion-color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.18);
+}

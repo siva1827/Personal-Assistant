@@ -8,10 +8,11 @@ import {
   IonInput,
   IonModal,
   IonText,
+  IonTextarea,
   IonTitle,
   IonToolbar,
 } from '@ionic/react'
-import { trashOutline } from 'ionicons/icons'
+import { chatbubbleEllipsesOutline, trashOutline } from 'ionicons/icons'
 import type { Category, Expense } from '../api/types'
 import {
   useCategories,
@@ -19,6 +20,7 @@ import {
   useDeleteExpense,
   useUpdateExpense,
 } from '../features/expenses/useExpenses'
+import { guessCategoryId, parseBankSms } from '../features/expenses/smsParser'
 
 const LAST_CATEGORY_KEY = 'lastExpenseCategoryId'
 
@@ -57,8 +59,65 @@ function ExpenseForm({ expense, categories, onDone }: FormProps) {
     else create.mutate(request, { onSuccess: onDone })
   }
 
+  const [smsOpen, setSmsOpen] = useState(false)
+  const [smsText, setSmsText] = useState('')
+  const [smsNote, setSmsNote] = useState<{ ok: boolean; text: string } | null>(null)
+
+  const fillFromSms = () => {
+    const parsed = parseBankSms(smsText)
+    if (!parsed) {
+      setSmsNote({ ok: false, text: "That doesn't look like a bank transaction message." })
+      return
+    }
+    if (parsed.direction === 'CREDIT') {
+      setSmsNote({ ok: false, text: `This looks like ₹${parsed.amount} received, not an expense.` })
+      return
+    }
+    setAmount(String(parsed.amount))
+    if (parsed.merchant) setNote(parsed.merchant)
+    if (parsed.date) setSpentOn(parsed.date)
+    const guessed = guessCategoryId(parsed.merchant, categories)
+    if (guessed !== null) setCategoryId(guessed)
+    setSmsNote({
+      ok: true,
+      text: guessed !== null ? 'Filled in. Check the details and save.' : 'Filled in. Pick a category and save.',
+    })
+  }
+
   return (
     <>
+      {!expense && (
+        <div style={{ marginBottom: 8 }}>
+          <IonButton fill="clear" size="small" onClick={() => setSmsOpen(!smsOpen)}>
+            <IonIcon slot="start" icon={chatbubbleEllipsesOutline} />
+            {smsOpen ? 'Hide bank SMS' : 'Paste a bank SMS'}
+          </IonButton>
+          {smsOpen && (
+            <div className="card" style={{ marginTop: 6 }}>
+              <IonTextarea
+                label="Bank SMS"
+                labelPlacement="floating"
+                fill="outline"
+                rows={3}
+                placeholder="Rs.250.00 debited from A/c XX1234 to VPA swiggy@upi on 26-10-26"
+                value={smsText}
+                onIonInput={(e) => {
+                  setSmsText(String(e.detail.value ?? ''))
+                  setSmsNote(null)
+                }}
+              />
+              <IonButton expand="block" size="small" style={{ marginTop: 10 }} disabled={!smsText.trim()} onClick={fillFromSms}>
+                Fill from SMS
+              </IonButton>
+              {smsNote && (
+                <IonText color={smsNote.ok ? 'success' : 'danger'}>
+                  <p role="status" style={{ margin: '8px 2px 0' }}>{smsNote.text}</p>
+                </IonText>
+              )}
+            </div>
+          )}
+        </div>
+      )}
       <IonInput
         className="amount-input"
         type="number"

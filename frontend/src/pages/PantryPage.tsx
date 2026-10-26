@@ -55,6 +55,7 @@ export default function PantryPage() {
         </IonToolbar>
         <IonToolbar>
           <IonSearchbar
+            className="search-field"
             placeholder="Search ingredients to add"
             value={query}
             debounce={250}
