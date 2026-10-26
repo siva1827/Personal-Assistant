@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: assistant
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/assistant}
+    username: ${DB_USER:assistant}
+    password: ${DB_PASSWORD:assistant}
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Flyway owns the schema
+      ddl-auto: none
+  flyway:
+    enabled: true
+
+app:
+  jwt:
+    # Required, at least 32 characters. Never commit a real value.
+    secret: ${JWT_SECRET}
+    access-ttl: 15m
+    refresh-ttl: 7d
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost,capacitor://localhost}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
