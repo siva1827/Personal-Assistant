@@ -96,7 +96,7 @@ function ExpenseForm({ expense, categories, onDone }: FormProps) {
             <div className="card" style={{ marginTop: 6 }}>
               <IonTextarea
                 label="Bank SMS"
-                labelPlacement="floating"
+                labelPlacement="stacked"
                 fill="outline"
                 rows={3}
                 placeholder="Rs.250.00 debited from A/c XX1234 to VPA swiggy@upi on 26-10-26"
@@ -122,6 +122,8 @@ function ExpenseForm({ expense, categories, onDone }: FormProps) {
         className="amount-input"
         type="number"
         inputmode="decimal"
+        step="0.01"
+        min={0}
         placeholder="0"
         label="Amount (₹)"
         labelPlacement="stacked"
@@ -150,7 +152,8 @@ function ExpenseForm({ expense, categories, onDone }: FormProps) {
 
       <IonInput
         label="Note (optional)"
-        labelPlacement="floating"
+        placeholder="e.g. Lunch with team"
+        labelPlacement="stacked"
         fill="outline"
         maxlength={200}
         value={note}

@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import {
+  IonBackButton,
   IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
   IonInput,
@@ -39,14 +41,14 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
       </p>
       <IonInput
         label="Name"
-        labelPlacement="floating"
+        labelPlacement="stacked"
         fill="outline"
         value={displayName}
         onIonInput={(e) => setDisplayName(String(e.detail.value ?? ''))}
       />
       <IonSelect
         label="Diet"
-        labelPlacement="floating"
+        labelPlacement="stacked"
         fill="outline"
         style={{ marginTop: 14 }}
         value={diet}
@@ -60,7 +62,7 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
       </IonSelect>
       <IonInput
         label="Allergies"
-        labelPlacement="floating"
+        labelPlacement="stacked"
         fill="outline"
         placeholder="peanut, shellfish"
         helperText="Comma separated. Recipes containing these are filtered out."
@@ -93,6 +95,9 @@ export default function ProfilePage() {
     <IonPage>
       <IonHeader className="ion-no-border">
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/home" />
+          </IonButtons>
           <IonTitle>Profile</IonTitle>
         </IonToolbar>
       </IonHeader>

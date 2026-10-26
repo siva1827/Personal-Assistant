@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   IonBackButton,
   IonButton,
@@ -10,11 +11,13 @@ import {
   IonPage,
   IonText,
   IonTitle,
+  IonToast,
   IonToolbar,
 } from '@ionic/react'
-import { heart, heartOutline, peopleOutline, timeOutline, trashOutline } from 'ionicons/icons'
+import { cartOutline, heart, heartOutline, peopleOutline, timeOutline, trashOutline } from 'ionicons/icons'
 import { useNavigate, useParams } from 'react-router-dom'
 import ListSkeleton from '../components/ListSkeleton'
+import { useAddMissingFromRecipe } from '../features/shopping/useShopping'
 import { useDeleteRecipe, useRecipe, useToggleFavorite } from '../features/recipes/useRecipes'
 
 export default function RecipeDetailPage() {
@@ -24,7 +27,10 @@ export default function RecipeDetailPage() {
   const recipe = useRecipe(recipeId)
   const toggle = useToggleFavorite()
   const remove = useDeleteRecipe()
+  const addMissing = useAddMissingFromRecipe()
+  const [toast, setToast] = useState(false)
   const data = recipe.data
+  const added = addMissing.data
 
   return (
     <IonPage>
@@ -79,6 +85,31 @@ export default function RecipeDetailPage() {
               </div>
             </div>
 
+            {data.missingIngredients.length > 0 && (
+              <div className="card">
+                <strong>
+                  {data.missingIngredients.length} missing {data.missingIngredients.length === 1 ? 'ingredient' : 'ingredients'}
+                </strong>
+                <p className="muted" style={{ margin: '4px 0 10px' }}>
+                  {data.missingIngredients.join(', ')}
+                </p>
+                <IonButton
+                  expand="block"
+                  size="small"
+                  disabled={addMissing.isPending}
+                  onClick={() => addMissing.mutate(data.id, { onSuccess: () => setToast(true) })}
+                >
+                  <IonIcon slot="start" icon={cartOutline} />
+                  Add to shopping list
+                </IonButton>
+                {addMissing.isError && (
+                  <IonText color="danger">
+                    <p role="alert" style={{ margin: '8px 0 0' }}>Could not update your shopping list.</p>
+                  </IonText>
+                )}
+              </div>
+            )}
+
             <div className="section-title">Ingredients</div>
             <div className="row-list">
               {data.ingredients.map((ing) => (
@@ -116,6 +147,19 @@ export default function RecipeDetailPage() {
             </div>
           </>
         )}
+        <IonToast
+          isOpen={toast}
+          duration={2500}
+          position="top"
+          message={
+            added
+              ? added.added.length === 0
+                ? 'Everything is already on your shopping list'
+                : `Added ${added.added.length} to your shopping list${added.skipped > 0 ? ` (${added.skipped} already there)` : ''}`
+              : ''
+          }
+          onDidDismiss={() => setToast(false)}
+        />
       </IonContent>
     </IonPage>
   )

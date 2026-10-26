@@ -35,7 +35,7 @@ export default function LoginPage() {
       >
         <IonInput
           label="Email"
-          labelPlacement="floating"
+          labelPlacement="stacked"
           fill="outline"
           type="email"
           autocomplete="email"
@@ -44,7 +44,7 @@ export default function LoginPage() {
         />
         <IonInput
           label="Password"
-          labelPlacement="floating"
+          labelPlacement="stacked"
           fill="outline"
           type="password"
           autocomplete="current-password"

@@ -140,3 +140,25 @@ export interface Budget {
   month: string
   limitAmount: number
 }
+
+export interface Task {
+  id: number
+  title: string
+  dueDate: string | null
+  status: 'OPEN' | 'DONE'
+  linkedRecipeId: number | null
+  completedAt: string | null
+}
+
+export interface ShoppingItem {
+  id: number
+  name: string
+  estimatedCost: number | null
+  purchased: boolean
+  sourceRecipeId: number | null
+}
+
+export interface AddedFromRecipe {
+  added: ShoppingItem[]
+  skipped: number
+}

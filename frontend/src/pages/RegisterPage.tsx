@@ -38,7 +38,7 @@ export default function RegisterPage() {
       >
         <IonInput
           label="Name"
-          labelPlacement="floating"
+          labelPlacement="stacked"
           fill="outline"
           autocomplete="name"
           value={displayName}
@@ -46,7 +46,7 @@ export default function RegisterPage() {
         />
         <IonInput
           label="Email"
-          labelPlacement="floating"
+          labelPlacement="stacked"
           fill="outline"
           type="email"
           autocomplete="email"
@@ -56,7 +56,7 @@ export default function RegisterPage() {
         />
         <IonInput
           label="Password"
-          labelPlacement="floating"
+          labelPlacement="stacked"
           fill="outline"
           type="password"
           autocomplete="new-password"

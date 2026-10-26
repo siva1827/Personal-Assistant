@@ -1,10 +1,11 @@
-import { IonButton, IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react'
-import { sparklesOutline } from 'ionicons/icons'
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react'
+import { personCircleOutline, sparklesOutline } from 'ionicons/icons'
 import { Link } from 'react-router-dom'
 import { formatMoney } from '../features/expenses/money'
 import { toMonthKey } from '../features/expenses/month'
 import { useSummary } from '../features/expenses/useExpenses'
-import { isExpiringSoon } from '../features/pantry/expiry'
+import { daysUntil, isExpiringSoon } from '../features/pantry/expiry'
+import { useOpenTasks } from '../features/tasks/useTasks'
 import { usePantry } from '../features/pantry/usePantry'
 import { useProfile } from '../features/profile/useProfile'
 import { useFavorites, useThemes } from '../features/recipes/useRecipes'
@@ -27,6 +28,10 @@ export default function HomePage() {
   const overBudget = summary.data?.byCategory.filter((c) => c.status === 'OVER').length ?? 0
   const nearBudget = summary.data?.byCategory.filter((c) => c.status === 'NEAR').length ?? 0
 
+  const tasks = useOpenTasks()
+  const overdueTasks = tasks.data?.filter((t) => t.dueDate && daysUntil(t.dueDate) < 0).length ?? 0
+  const dueToday = tasks.data?.filter((t) => t.dueDate && daysUntil(t.dueDate) === 0).length ?? 0
+
   const name = profile.data?.displayName?.split(' ')[0]
   const expiring = pantry.data?.filter((p) => isExpiringSoon(p.expiryDate)).length ?? 0
 
@@ -35,6 +40,11 @@ export default function HomePage() {
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonTitle>Daily Assistant</IonTitle>
+          <IonButtons slot="end">
+            <IonButton routerLink="/profile" aria-label="Profile and settings">
+              <IonIcon slot="icon-only" icon={personCircleOutline} />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent className="app-content">
@@ -80,6 +90,33 @@ export default function HomePage() {
             <div className="label">Favorites</div>
           </Link>
         </div>
+
+        <div className="section-title">To do</div>
+        <Link className="card" to="/tasks" style={{ display: 'block', color: 'inherit', textDecoration: 'none' }}>
+          {tasks.data ? (
+            tasks.data.length === 0 ? (
+              <span className="muted">Nothing on your list. Nice.</span>
+            ) : (
+              <>
+                <strong>
+                  {tasks.data.length} open {tasks.data.length === 1 ? 'task' : 'tasks'}
+                </strong>
+                {overdueTasks > 0 && (
+                  <span className="pill danger" style={{ marginLeft: 8 }}>
+                    {overdueTasks} overdue
+                  </span>
+                )}
+                {overdueTasks === 0 && dueToday > 0 && (
+                  <span className="pill warn" style={{ marginLeft: 8 }}>
+                    {dueToday} due today
+                  </span>
+                )}
+              </>
+            )
+          ) : (
+            <span className="muted">Loading…</span>
+          )}
+        </Link>
 
         <div className="section-title">This month</div>
         <Link className="card" to="/expenses" style={{ display: 'block', color: 'inherit', textDecoration: 'none' }}>
