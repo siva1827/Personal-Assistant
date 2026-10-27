@@ -11,6 +11,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     Optional<Recipe> findByIdAndUserId(Long id, Long userId);
 
+    java.util.List<Recipe> findByRequestIdOrderByIdAsc(Long requestId);
+
     Page<Recipe> findByUserIdOrderByCreatedAtDescIdDesc(Long userId, Pageable pageable);
 
     @Query("""

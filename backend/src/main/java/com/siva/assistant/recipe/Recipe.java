@@ -62,6 +62,22 @@ public class Recipe {
     protected Recipe() {
     }
 
+    public Recipe(Long userId, Long requestId, String title, String description, Integer cookTimeMinutes,
+                  Integer servings, String cuisine, DietaryPreference dietaryType, String ingredients,
+                  String missingIngredients, String steps) {
+        this.userId = userId;
+        this.requestId = requestId;
+        this.title = title;
+        this.description = description;
+        this.cookTimeMinutes = cookTimeMinutes;
+        this.servings = servings;
+        this.cuisine = cuisine;
+        this.dietaryType = dietaryType;
+        this.ingredients = ingredients;
+        this.missingIngredients = missingIngredients;
+        this.steps = steps;
+    }
+
     public Long getId() {
         return id;
     }

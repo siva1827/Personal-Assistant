@@ -1,5 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { addFavorite, deleteRecipe, getFavorites, getHistory, getRecipe, removeFavorite } from '../../api/recipes'
+import {
+  addFavorite,
+  deleteRecipe,
+  getFavorites,
+  getHistory,
+  getRecipe,
+  removeFavorite,
+  suggestRecipes,
+} from '../../api/recipes'
 import { listThemes } from '../../api/themes'
 
 export const useThemes = () => useQuery({ queryKey: ['themes'], queryFn: listThemes, staleTime: Infinity })
@@ -23,6 +31,15 @@ export const useDeleteRecipe = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: deleteRecipe,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['recipes'] }),
+  })
+}
+
+/** Asks the AI for recipes. New recipes land in the history, so the recipe lists are refreshed. */
+export const useSuggestRecipes = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: suggestRecipes,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['recipes'] }),
   })
 }

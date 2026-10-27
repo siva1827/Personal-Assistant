@@ -120,6 +120,8 @@ Two more optional settings:
   future push messages.
 - `FIREBASE_CREDENTIALS_FILE` (or `FIREBASE_CREDENTIALS_JSON`): the Firebase service-account key that turns
   on push notifications. Optional; see [FIREBASE_SETUP.md](FIREBASE_SETUP.md).
+- `GEMINI_API_KEY`: turns on AI recipe suggestions. Optional; `AI_PROVIDER=demo` tries the flow with made-up
+  recipes and no key. See [AI_SETUP.md](AI_SETUP.md).
 
 Success looks like `Started AssistantApplication in ... seconds`. Check it:
 open http://localhost:8080/swagger-ui.html.
@@ -151,7 +153,8 @@ The app follows your operating system's light or dark mode.
 3. **Spending:** tap **+**, enter an amount, pick a category, save. Open **Budgets** and set a limit.
 4. **Tasks:** add a task with a due date, tick it off; make one repeat weekly and tick it off to see the next one appear. Switch to **Shopping list** and add an item.
 5. **Notifications:** tap the bell on Home. A task due today, a budget near its limit or food about to expire shows up there. Profile has an optional **Device alerts** switch.
-6. **Recipes** will be empty: AI recipe suggestions are not switched on yet.
+6. **Recipes:** tap **Ideas**. Without an API key it says AI is not set up; start the API with `AI_PROVIDER=demo` to try
+   it with made-up recipes, or see [AI_SETUP.md](AI_SETUP.md) to switch on the real thing.
 
 ## 8. Run the tests
 

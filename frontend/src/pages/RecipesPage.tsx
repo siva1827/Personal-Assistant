@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import {
+  IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
@@ -12,7 +14,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react'
-import { heart, timeOutline } from 'ionicons/icons'
+import { heart, sparklesOutline, timeOutline } from 'ionicons/icons'
 import EmptyState from '../components/EmptyState'
 import ListSkeleton from '../components/ListSkeleton'
 import { useFavorites, useHistory } from '../features/recipes/useRecipes'
@@ -31,6 +33,12 @@ export default function RecipesPage() {
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonTitle>Recipes</IonTitle>
+          <IonButtons slot="end">
+            <IonButton routerLink="/recipes/suggest" aria-label="Get recipe ideas">
+              <IonIcon slot="start" icon={sparklesOutline} />
+              Ideas
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
         <IonToolbar>
           <IonSegment value={tab} onIonChange={(e) => setTab(e.detail.value as Tab)}>
@@ -52,7 +60,7 @@ export default function RecipesPage() {
         )}
         {query.isSuccess && recipes.length === 0 && tab === 'history' && (
           <EmptyState emoji="🍳" title="No recipes yet">
-            Once AI suggestions are switched on, everything you cook up will show here.
+            Tap Ideas to get recipes from what's in your pantry. Everything you get is kept here.
           </EmptyState>
         )}
         {query.isSuccess && recipes.length === 0 && tab === 'favorites' && (

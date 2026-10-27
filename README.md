@@ -73,9 +73,9 @@ Phase 2: expense categories (defaults created per user), expenses with quick-add
 
 Phase 3: tasks with due dates, daily/weekly/monthly repeating tasks (completing one creates the next), and a notification centre. A scheduled job creates reminders for tasks due or overdue, budgets near or over their limit, and pantry items about to expire; they show under the bell on Home, with optional device alerts while the app is open. Push notifications to the Android app through Firebase are built and switch on once you add your Firebase files ([docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md)). Still to do: Account Aggregator sandbox demo.
 
-On hold: the AI provider integration (`POST /recipes/suggest`, prompt builder, validator). Recipes are read from the database, so this plugs in without changing the existing endpoints.
+AI recipe suggestions (`POST /api/v1/recipes/suggest`): built behind a provider-neutral interface with Gemini Flash as the default. The model must answer in a fixed JSON format (validated, one repair retry), allergies and diet are enforced in code, missing ingredients are computed against the real pantry, and there is a daily limit, a short cache and token tracking. It switches on when you add `GEMINI_API_KEY` ([docs/AI_SETUP.md](docs/AI_SETUP.md)); `AI_PROVIDER=demo` tries the whole flow without a key.
 
-Next: create the Firebase project and try push and SMS import on a real phone, tune the SMS parser to your bank, then the AI suggestions when you are ready.
+Next: add your Gemini key and try real suggestions, create the Firebase project, try push and SMS import on a real phone and tune the SMS parser to your bank.
 
 ## Running the tests
 

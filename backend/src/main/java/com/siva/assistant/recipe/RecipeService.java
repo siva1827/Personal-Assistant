@@ -36,6 +36,14 @@ public class RecipeService {
         return toResponse(recipe, favorite);
     }
 
+    /** Turns recipes into responses with the favorite flag for this user. */
+    @Transactional(readOnly = true)
+    public List<RecipeResponse> responsesFor(long userId, List<Recipe> list) {
+        List<Long> ids = list.stream().map(Recipe::getId).toList();
+        Set<Long> favoriteIds = ids.isEmpty() ? Set.of() : favorites.findFavoriteIds(userId, ids);
+        return list.stream().map(r -> toResponse(r, favoriteIds.contains(r.getId()))).toList();
+    }
+
     @Transactional(readOnly = true)
     public PageResponse<RecipeResponse> history(long userId, int page, int size) {
         return toPage(userId, recipes.findByUserIdOrderByCreatedAtDescIdDesc(userId, PageRequest.of(page, size)));

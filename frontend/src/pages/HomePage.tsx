@@ -78,9 +78,9 @@ export default function HomePage() {
               </button>
             ))}
           </div>
-          <IonButton expand="block" color="light" style={{ marginTop: 16 }} disabled>
+          <IonButton expand="block" color="light" style={{ marginTop: 16 }} routerLink="/recipes/suggest">
             <IonIcon slot="start" icon={sparklesOutline} />
-            Suggestions coming soon
+            Suggest recipes
           </IonButton>
         </section>
 

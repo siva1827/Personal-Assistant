@@ -185,3 +185,20 @@ export interface NotificationFeed {
   unread: number
   items: AppNotification[]
 }
+
+export interface SuggestRequest {
+  themeId?: number
+  customNote?: string
+  count?: number
+  /** Skip the short-term cache and ask the model again */
+  fresh?: boolean
+}
+
+export interface SuggestionResponse {
+  recipes: Recipe[]
+  /** True when recent suggestions for the same pantry were reused */
+  cached: boolean
+  /** Recipes removed because they clashed with allergies or diet */
+  filteredOut: number
+  model: string
+}

@@ -25,6 +25,16 @@ app:
   notifications:
     # How often reminders are generated for every user (ISO-8601 duration)
     interval: ${NOTIFICATION_INTERVAL:PT30M}
+  ai:
+    # auto = Gemini when GEMINI_API_KEY is set; demo = made-up recipes for trying the flow; none = off
+    provider: ${AI_PROVIDER:auto}
+    daily-limit: ${AI_DAILY_LIMIT:20}
+    cache-minutes: ${AI_CACHE_MINUTES:30}
+    gemini:
+      api-key: ${GEMINI_API_KEY:}
+      model: ${GEMINI_MODEL:gemini-2.5-flash}
+      base-url: https://generativelanguage.googleapis.com
+      timeout-seconds: 60
   firebase:
     # Push messages are off unless one of these is set (see docs/FIREBASE_SETUP.md).
     # A service-account key file path, or the JSON itself for hosts where files are awkward.
