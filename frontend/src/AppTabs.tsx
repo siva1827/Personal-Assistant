@@ -9,6 +9,7 @@ import {
 import { Navigate, Route } from 'react-router-dom'
 import { useDeviceAlerts } from './features/notifications/deviceAlerts'
 import { useNotificationFeed } from './features/notifications/useNotifications'
+import { usePushSync } from './features/push/push'
 import BudgetsPage from './pages/BudgetsPage'
 import NotificationsPage from './pages/NotificationsPage'
 import ExpensesPage from './pages/ExpensesPage'
@@ -24,6 +25,7 @@ export default function AppTabs() {
   // Keeps the notification feed fresh app-wide and shows device alerts for new items
   const feed = useNotificationFeed()
   useDeviceAlerts(feed.data?.items)
+  usePushSync()
 
   return (
     <IonTabs>

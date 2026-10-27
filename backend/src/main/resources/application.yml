@@ -25,6 +25,11 @@ app:
   notifications:
     # How often reminders are generated for every user (ISO-8601 duration)
     interval: ${NOTIFICATION_INTERVAL:PT30M}
+  firebase:
+    # Push messages are off unless one of these is set (see docs/FIREBASE_SETUP.md).
+    # A service-account key file path, or the JSON itself for hosts where files are awkward.
+    credentials-file: ${FIREBASE_CREDENTIALS_FILE:}
+    credentials-json: ${FIREBASE_CREDENTIALS_JSON:}
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost,https://localhost,capacitor://localhost}
 

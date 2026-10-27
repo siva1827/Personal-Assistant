@@ -118,6 +118,8 @@ Two more optional settings:
 - `NOTIFICATION_INTERVAL` (default `PT30M`): how often reminders are generated for all users.
   Reminders are also refreshed whenever the app loads them, so this mostly matters for the
   future push messages.
+- `FIREBASE_CREDENTIALS_FILE` (or `FIREBASE_CREDENTIALS_JSON`): the Firebase service-account key that turns
+  on push notifications. Optional; see [FIREBASE_SETUP.md](FIREBASE_SETUP.md).
 
 Success looks like `Started AssistantApplication in ... seconds`. Check it:
 open http://localhost:8080/swagger-ui.html.

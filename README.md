@@ -71,11 +71,11 @@ Done: monorepo skeleton, Flyway schema and seed data, register/login/refresh and
 
 Phase 2: expense categories (defaults created per user), expenses with quick-add, a bank-SMS paste parser, monthly summary with a daily chart, per-category monthly budgets with OK / near / over status, a shopping list (including a recipe's missing ingredients), and the Spending, Budgets and Shopping screens. Android SMS import: a small native plugin reads bank alerts on the phone, they are parsed on-device into drafts you confirm, and a fingerprint stops duplicates (see [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md), section 10).
 
-Phase 3: tasks with due dates, daily/weekly/monthly repeating tasks (completing one creates the next), and a notification centre. A scheduled job creates reminders for tasks due or overdue, budgets near or over their limit, and pantry items about to expire; they show under the bell on Home, with optional device alerts while the app is open. Still to do: push messages when the app is closed (needs a Firebase project), Account Aggregator sandbox demo.
+Phase 3: tasks with due dates, daily/weekly/monthly repeating tasks (completing one creates the next), and a notification centre. A scheduled job creates reminders for tasks due or overdue, budgets near or over their limit, and pantry items about to expire; they show under the bell on Home, with optional device alerts while the app is open. Push notifications to the Android app through Firebase are built and switch on once you add your Firebase files ([docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md)). Still to do: Account Aggregator sandbox demo.
 
 On hold: the AI provider integration (`POST /recipes/suggest`, prompt builder, validator). Recipes are read from the database, so this plugs in without changing the existing endpoints.
 
-Next: try the SMS import on a real phone and tune the parser to your bank, push messages via Firebase, then the AI suggestions when you are ready.
+Next: create the Firebase project and try push and SMS import on a real phone, tune the SMS parser to your bank, then the AI suggestions when you are ready.
 
 ## Running the tests
 

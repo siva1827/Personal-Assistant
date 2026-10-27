@@ -20,6 +20,7 @@
         <java.version>17</java.version>
         <jjwt.version>0.12.6</jjwt.version>
         <springdoc.version>2.8.6</springdoc.version>
+        <google-auth.version>1.54.0</google-auth.version>
     </properties>
 
     <dependencies>
@@ -70,6 +71,13 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>${jjwt.version}</version>
             <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <!-- Service-account access tokens for the Firebase Cloud Messaging HTTP API -->
+            <groupId>com.google.auth</groupId>
+            <artifactId>google-auth-library-oauth2-http</artifactId>
+            <version>${google-auth.version}</version>
         </dependency>
 
         <dependency>

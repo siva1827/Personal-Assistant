@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +32,12 @@ public class NotificationService {
     private final PantryItemRepository pantry;
     private final SpendingSummaryService spending;
     private final Clock clock;
+    private final ApplicationEventPublisher events;
 
     public NotificationService(NotificationRepository notifications, TaskRepository tasks,
-                               PantryItemRepository pantry, SpendingSummaryService spending, Clock clock) {
+                               PantryItemRepository pantry, SpendingSummaryService spending, Clock clock,
+                               ApplicationEventPublisher events) {
+        this.events = events;
         this.notifications = notifications;
         this.tasks = tasks;
         this.pantry = pantry;
@@ -128,6 +132,8 @@ public class NotificationService {
             return 0;
         }
         notifications.save(new Notification(userId, type, title, body, link, key));
+        // Delivered as a push after the transaction commits (see PushNotifier)
+        events.publishEvent(new NotificationCreated(userId, type, title, body, link));
         return 1;
     }
 }

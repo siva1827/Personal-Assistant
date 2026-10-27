@@ -33,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,6 +51,8 @@ class NotificationServiceTest {
     PantryItemRepository pantry;
     @Mock
     SpendingSummaryService spending;
+    @Mock
+    ApplicationEventPublisher events;
 
     NotificationService service;
     final Set<String> existingKeys = new java.util.HashSet<>();
@@ -58,7 +61,7 @@ class NotificationServiceTest {
     @BeforeEach
     void setUp() {
         Clock clock = Clock.fixed(Instant.parse("2026-10-26T06:00:00Z"), ZoneId.of("UTC"));
-        service = new NotificationService(notifications, tasks, pantry, spending, clock);
+        service = new NotificationService(notifications, tasks, pantry, spending, clock, events);
         lenient().when(notifications.existsByUserIdAndDedupeKey(org.mockito.ArgumentMatchers.eq(USER), anyString()))
                 .thenAnswer(inv -> existingKeys.contains(inv.<String>getArgument(1)));
         lenient().when(notifications.save(any())).thenAnswer(inv -> {
@@ -145,6 +148,23 @@ class NotificationServiceTest {
         assertThat(saved).extracting(Notification::getBody).containsExactly(
                 "milk has expired", "curd expires today", "spinach expires in 1 day", "paneer expires in 2 days");
         assertThat(saved).allMatch(n -> n.getType() == NotificationType.PANTRY_EXPIRING);
+    }
+
+    @Test
+    void publishesAnEventOnlyForNotificationsThatAreNew() {
+        when(tasks.findByUserIdAndStatusAndDueDateLessThanEqual(USER, TaskStatus.OPEN, TODAY))
+                .thenReturn(List.of(task(1, "Pay rent", TODAY)));
+
+        service.generateFor(USER);
+        service.generateFor(USER);
+
+        ArgumentCaptor<NotificationCreated> event = ArgumentCaptor.forClass(NotificationCreated.class);
+        verify(events, org.mockito.Mockito.times(1)).publishEvent(event.capture());
+        assertThat(event.getValue().userId()).isEqualTo(USER);
+        assertThat(event.getValue().type()).isEqualTo(NotificationType.TASK_DUE);
+        assertThat(event.getValue().title()).isEqualTo("Due today");
+        assertThat(event.getValue().body()).isEqualTo("Pay rent");
+        assertThat(event.getValue().link()).isEqualTo("/tasks");
     }
 
     @Test

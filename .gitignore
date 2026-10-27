@@ -17,3 +17,8 @@ frontend/ios/
 *.iml
 .DS_Store
 Thumbs.db
+
+# Firebase client config for your own project (see docs/FIREBASE_SETUP.md); service-account keys must never be committed
+frontend/android/app/google-services.json
+*firebase-adminsdk*.json
+firebase-service-account*.json

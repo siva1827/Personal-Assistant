@@ -20,6 +20,8 @@ import type { DietaryPreference, UserProfile } from '../api/types'
 import { useAuth } from '../auth/useAuth'
 import { alertsEnabled, alertsSupported, setAlertsEnabled } from '../features/notifications/deviceAlerts'
 import { useNotificationFeed } from '../features/notifications/useNotifications'
+import { disablePush, enablePush, pushPreferred, pushSupported, sendTestPush } from '../features/push/push'
+import { describeTestResult, type TestOutcome } from '../features/push/testResult'
 import { parseAllergies, useProfile, useUpdateProfile } from '../features/profile/useProfile'
 
 const DIETS: { value: DietaryPreference; label: string }[] = [
@@ -139,6 +141,89 @@ function DeviceAlertsCard() {
   )
 }
 
+function PushCard() {
+  const [on, setOn] = useState(pushPreferred())
+  const [busy, setBusy] = useState(false)
+  const [outcome, setOutcome] = useState<TestOutcome | null>(null)
+
+  if (!pushSupported()) {
+    return (
+      <div className="card">
+        <strong>Push notifications</strong>
+        <p className="muted" style={{ marginBottom: 0 }}>
+          Push messages that reach you even when the app is closed work in the Android app. In a browser, use
+          Device alerts above, which only work while the app is open.
+        </p>
+      </div>
+    )
+  }
+
+  const toggle = async (next: boolean) => {
+    setBusy(true)
+    setOutcome(null)
+    try {
+      if (next) {
+        const granted = await enablePush()
+        setOn(granted)
+        if (!granted) {
+          setOutcome({ ok: false, message: 'Notifications are blocked for this app. Allow them in your phone settings, then try again.' })
+        }
+      } else {
+        await disablePush()
+        setOn(false)
+      }
+    } catch {
+      setOn(pushPreferred())
+      setOutcome({ ok: false, message: 'Could not set up push. Check the Firebase files and your connection, then try again.' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const test = async () => {
+    setBusy(true)
+    try {
+      setOutcome(describeTestResult(await sendTestPush()))
+    } catch {
+      setOutcome({ ok: false, message: 'Could not reach the server.' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="card">
+      <IonItem lines="none" style={{ '--padding-start': '0px', '--inner-padding-end': '0px' }}>
+        <IonLabel className="ion-text-wrap">
+          <h3>Push notifications</h3>
+          <p>Get reminders on this phone even when the app is closed.</p>
+        </IonLabel>
+        <IonToggle
+          slot="end"
+          aria-label="Push notifications"
+          checked={on}
+          disabled={busy}
+          onIonChange={(e) => {
+            if (e.detail.checked !== on) void toggle(e.detail.checked)
+          }}
+        />
+      </IonItem>
+      {on && (
+        <IonButton size="small" fill="outline" disabled={busy} onClick={() => void test()}>
+          Send a test notification
+        </IonButton>
+      )}
+      {outcome && (
+        <IonText color={outcome.ok ? 'success' : 'danger'}>
+          <p role={outcome.ok ? 'status' : 'alert'} style={{ margin: '8px 0 0' }}>
+            {outcome.message}
+          </p>
+        </IonText>
+      )}
+    </div>
+  )
+}
+
 export default function ProfilePage() {
   const profile = useProfile()
   const { logout } = useAuth()
@@ -161,6 +246,7 @@ export default function ProfilePage() {
         )}
         {profile.data && <ProfileForm profile={profile.data} />}
         <DeviceAlertsCard />
+        <PushCard />
         <IonButton expand="block" fill="outline" color="danger" onClick={logout}>
           Sign out
         </IonButton>
