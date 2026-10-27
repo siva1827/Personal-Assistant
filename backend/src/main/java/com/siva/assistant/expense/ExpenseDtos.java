@@ -14,12 +14,17 @@ public final class ExpenseDtos {
     private ExpenseDtos() {
     }
 
-    /** spentOn defaults to today. */
+    /**
+     * spentOn defaults to today and source to MANUAL. Imports from a bank SMS send source SMS and an
+     * externalRef (a fingerprint of the message); the same externalRef is only accepted once.
+     */
     public record CreateExpenseRequest(
             @NotNull Long categoryId,
             @NotNull @DecimalMin("0.01") @Digits(integer = 10, fraction = 2) BigDecimal amount,
             @Size(max = 200) String note,
-            LocalDate spentOn) {
+            LocalDate spentOn,
+            ExpenseSource source,
+            @Size(max = 64) String externalRef) {
     }
 
     /** Fields left null are not changed; a blank note clears it. */

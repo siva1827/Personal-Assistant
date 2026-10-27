@@ -17,6 +17,7 @@ import PantryPage from './pages/PantryPage'
 import ProfilePage from './pages/ProfilePage'
 import RecipeDetailPage from './pages/RecipeDetailPage'
 import RecipesPage from './pages/RecipesPage'
+import SmsImportPage from './pages/SmsImportPage'
 import TasksPage from './pages/TasksPage'
 
 export default function AppTabs() {
@@ -33,6 +34,7 @@ export default function AppTabs() {
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />
         <Route path="/expenses" element={<ExpensesPage />} />
         <Route path="/budgets" element={<BudgetsPage />} />
+        <Route path="/expenses/sms" element={<SmsImportPage />} />
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/profile" element={<ProfilePage />} />

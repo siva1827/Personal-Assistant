@@ -10,6 +10,10 @@ const AMOUNT = /(?:rs\.?|inr|₹)\s*([\d,]+(?:\.\d{1,2})?)/i
 const DEBIT_WORDS = /\b(debited|spent|sent|paid|purchase|withdrawn|payment of|deducted)\b/i
 const CREDIT_WORDS = /\b(credited|received|deposited|refund(?:ed)?)\b/i
 
+// Messages that mention an amount but are not a completed payment
+const NOT_A_TRANSACTION =
+  /\b(otp|one[- ]time password|verification code|passcode)\b|\bwill be (?:debited|deducted)\b|\b(declined|failed|unsuccessful|insufficient|reversed|requested)\b|\bpayment (?:due|reminder)\b/i
+
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
 
 function pad(n: number): string {
@@ -66,6 +70,7 @@ function findMerchant(text: string): string | null {
  */
 export function parseBankSms(text: string): ParsedSms | null {
   const message = text.replace(/\s+/g, ' ').trim()
+  if (NOT_A_TRANSACTION.test(message)) return null
   const amountMatch = message.match(AMOUNT)
   if (!amountMatch) return null
   const amount = Number(amountMatch[1].replace(/,/g, ''))

@@ -21,6 +21,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     boolean existsByCategoryId(Long categoryId);
 
+    boolean existsByUserIdAndExternalRef(Long userId, String externalRef);
+
     @Query("""
             select new com.siva.assistant.expense.CategoryTotal(e.category.id, sum(e.amount))
             from Expense e

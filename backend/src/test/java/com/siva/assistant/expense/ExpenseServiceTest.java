@@ -51,7 +51,7 @@ class ExpenseServiceTest {
         when(categories.findByIdAndUserId(1L, USER)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.create(USER,
-                new CreateExpenseRequest(1L, new BigDecimal("10"), null, null)))
+                new CreateExpenseRequest(1L, new BigDecimal("10"), null, null, null, null)))
                 .isInstanceOfSatisfying(ApiException.class,
                         e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.NOT_FOUND));
         verify(expenses, never()).save(any());
@@ -62,11 +62,55 @@ class ExpenseServiceTest {
         when(categories.findByIdAndUserId(1L, USER)).thenReturn(Optional.of(category(1L, "Food")));
         when(expenses.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        var response = service.create(USER, new CreateExpenseRequest(1L, new BigDecimal("12.50"), "  lunch ", null));
+        var response = service.create(USER, new CreateExpenseRequest(1L, new BigDecimal("12.50"), "  lunch ", null, null, null));
 
         assertThat(response.spentOn()).isEqualTo(LocalDate.now());
         assertThat(response.note()).isEqualTo("lunch");
         assertThat(response.source()).isEqualTo(ExpenseSource.MANUAL);
+    }
+
+    @Test
+    void smsImportKeepsTheSourceAndFingerprint() {
+        when(categories.findByIdAndUserId(1L, USER)).thenReturn(Optional.of(category(1L, "Food")));
+        when(expenses.existsByUserIdAndExternalRef(USER, "abc123")).thenReturn(false);
+        when(expenses.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        var response = service.create(USER, new CreateExpenseRequest(1L, new BigDecimal("250"), "swiggy",
+                LocalDate.of(2026, 10, 26), ExpenseSource.SMS, " abc123 "));
+
+        assertThat(response.source()).isEqualTo(ExpenseSource.SMS);
+        org.mockito.ArgumentCaptor<Expense> saved = org.mockito.ArgumentCaptor.forClass(Expense.class);
+        verify(expenses).save(saved.capture());
+        assertThat(saved.getValue().getExternalRef()).isEqualTo("abc123");
+    }
+
+    @Test
+    void theSameSmsCannotBeImportedTwice() {
+        when(expenses.existsByUserIdAndExternalRef(USER, "abc123")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.create(USER, new CreateExpenseRequest(1L, new BigDecimal("250"), null,
+                null, ExpenseSource.SMS, "abc123")))
+                .isInstanceOfSatisfying(ApiException.class,
+                        e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.CONFLICT));
+        verify(expenses, never()).save(any());
+    }
+
+    @Test
+    void clientsCannotCreateBankSyncExpenses() {
+        assertThatThrownBy(() -> service.create(USER, new CreateExpenseRequest(1L, new BigDecimal("5"), null,
+                null, ExpenseSource.BANK_SYNC, null)))
+                .isInstanceOfSatisfying(ApiException.class,
+                        e -> assertThat(e.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    void aBlankFingerprintIsTreatedAsNone() {
+        when(categories.findByIdAndUserId(1L, USER)).thenReturn(Optional.of(category(1L, "Food")));
+        when(expenses.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        service.create(USER, new CreateExpenseRequest(1L, new BigDecimal("5"), null, null, null, "   "));
+
+        verify(expenses, never()).existsByUserIdAndExternalRef(any(), any());
     }
 
     @Test

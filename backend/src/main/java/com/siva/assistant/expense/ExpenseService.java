@@ -35,10 +35,19 @@ public class ExpenseService {
 
     @Transactional
     public ExpenseResponse create(long userId, CreateExpenseRequest request) {
+        ExpenseSource source = request.source() == null ? ExpenseSource.MANUAL : request.source();
+        if (source == ExpenseSource.BANK_SYNC) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "BANK_SYNC expenses are created by the server");
+        }
+        String externalRef = request.externalRef() == null || request.externalRef().isBlank()
+                ? null : request.externalRef().trim();
+        if (externalRef != null && expenses.existsByUserIdAndExternalRef(userId, externalRef)) {
+            throw new ApiException(HttpStatus.CONFLICT, "That transaction was already added");
+        }
         Category category = findCategory(userId, request.categoryId());
         LocalDate spentOn = request.spentOn() != null ? request.spentOn() : LocalDate.now();
         Expense expense = new Expense(userId, category, request.amount(), cleanNote(request.note()), spentOn,
-                ExpenseSource.MANUAL);
+                source, externalRef);
         return ExpenseResponse.from(expenses.save(expense));
     }
 

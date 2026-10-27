@@ -26,7 +26,7 @@ app:
     # How often reminders are generated for every user (ISO-8601 duration)
     interval: ${NOTIFICATION_INTERVAL:PT30M}
   cors:
-    allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost,capacitor://localhost}
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost,https://localhost,capacitor://localhost}
 
 springdoc:
   swagger-ui:

@@ -38,6 +38,14 @@ describe('parseBankSms', () => {
     expect(parseBankSms('₹75 paid')).toEqual({ direction: 'DEBIT', amount: 75, merchant: null, date: null })
   })
 
+  it('ignores OTPs, failed payments and upcoming-debit reminders', () => {
+    expect(parseBankSms('OTP for payment of Rs 500 at AMAZON is 123456. Do not share.')).toBeNull()
+    expect(parseBankSms('Your payment of Rs.250.00 to SWIGGY has failed. Amount not debited.')).toBeNull()
+    expect(parseBankSms('Transaction of Rs 900 declined due to insufficient balance in A/c XX1234')).toBeNull()
+    expect(parseBankSms('Rs 499 will be debited from your A/c XX1234 on 28-10-26 for Netflix mandate')).toBeNull()
+    expect(parseBankSms('Reminder: card payment due. Pay Rs 5,200 by 05-11-26 to avoid charges')).toBeNull()
+  })
+
   it('returns null for messages that are not transactions', () => {
     expect(parseBankSms('Your OTP is 123456. Do not share it with anyone.')).toBeNull()
     expect(parseBankSms('Hello, how are you?')).toBeNull()

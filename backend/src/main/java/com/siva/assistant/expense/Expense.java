@@ -44,6 +44,9 @@ public class Expense {
     @Column(nullable = false)
     private ExpenseSource source = ExpenseSource.MANUAL;
 
+    @Column(name = "external_ref")
+    private String externalRef;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -53,6 +56,12 @@ public class Expense {
 
     public Expense(Long userId, Category category, BigDecimal amount, String note, LocalDate spentOn,
                    ExpenseSource source) {
+        this(userId, category, amount, note, spentOn, source, null);
+    }
+
+    public Expense(Long userId, Category category, BigDecimal amount, String note, LocalDate spentOn,
+                   ExpenseSource source, String externalRef) {
+        this.externalRef = externalRef;
         this.userId = userId;
         this.category = category;
         this.amount = amount;
@@ -103,5 +112,9 @@ public class Expense {
 
     public ExpenseSource getSource() {
         return source;
+    }
+
+    public String getExternalRef() {
+        return externalRef;
     }
 }

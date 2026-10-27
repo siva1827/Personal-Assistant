@@ -108,6 +108,9 @@ export interface ExpenseRequest {
   amount: number
   note?: string
   spentOn?: string
+  /** Imports from a bank SMS use SMS plus a fingerprint so a message is only ever added once */
+  source?: 'MANUAL' | 'SMS'
+  externalRef?: string
 }
 
 export type BudgetStatus = 'OK' | 'NEAR' | 'OVER'

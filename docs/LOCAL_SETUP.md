@@ -175,19 +175,82 @@ The API only allows browser requests from known addresses. To open the app from 
 5. Open `http://192.168.1.20:5173` on the phone. You may need to allow ports 5173 and 8080
    through the computer's firewall. Only do this on a network you trust.
 
-## 10. Optional: Android app (Capacitor)
+## 10. Optional: Android app and SMS import
 
-Needs Android Studio. From `frontend/`:
+The Android app is the same web app wrapped by Capacitor, plus one small native plugin
+(`frontend/android/app/src/main/java/com/siva/assistant/SmsInboxPlugin.java`) that reads text
+messages so bank transaction alerts can be turned into expenses. The Android project is
+committed in `frontend/android`.
+
+### 10.1 What the SMS import does (and does not do)
+
+- Tap **Spending, SMS, Scan messages**. Android asks once for permission to read messages.
+- Messages are read **and understood on the phone**. Only messages from named sender ids such as
+  `AX-HDFCBK` are looked at (phone numbers are skipped), and OTPs, credits, failed payments and
+  "will be debited" reminders are ignored.
+- Each found debit is shown as a draft with a category guess. **Nothing is saved until you tap Add.**
+- Only the amount, shop, date and a fingerprint of the message are sent to the server. The message
+  text never leaves the phone. The fingerprint stops the same SMS being added twice, even from a
+  second device.
+- The scan covers Today, 3 days or 7 days. Messages you added or skipped are not offered again.
+- In a browser there is no inbox, so the screen offers **Load sample messages** to try it out.
+
+### 10.2 Extra tools for building the app
+
+| Tool | Version | Notes |
+| --- | --- | --- |
+| JDK | **21** | Capacitor 8 needs 21 for Android builds (the backend runs fine on 21 too) |
+| Android SDK | platform 36, build-tools 35 and 36 | easiest via Android Studio; or the command-line tools |
+| Gradle | 8.14 | downloaded automatically by `./gradlew` on first use |
+
+Set `JAVA_HOME` to JDK 21 and `ANDROID_HOME` to your SDK folder (Android Studio shows it under
+Settings, Languages & Frameworks, Android SDK). The first build downloads several hundred MB.
+
+### 10.3 Build and install a debug app
+
+The phone cannot reach `localhost` on your computer, so the app must be built to use your computer's
+LAN IP, and the API must be reachable from the phone (section 9: find the IP, allow ports in the
+firewall, keep both on the same Wi-Fi).
 
 ```bash
-npm run build
-npx cap add android      # first time only
-npx cap sync
-npx cap open android     # opens Android Studio; run on an emulator or device
+cd frontend
+# 1. Point the app at the API on your computer (use your own IP)
+echo "VITE_API_URL=http://192.168.1.20:8080/api/v1" > .env.local
+# 2. Build the web app and copy it into the Android project
+#    CAP_DEV=1 allows plain http to your computer; never use it for a release build
+CAP_DEV=1 npm run android:sync
+# 3. Build the APK
+cd android
+./gradlew assembleDebug            # Windows: gradlew.bat assembleDebug
 ```
 
-The Android app cannot reach `localhost` on your computer. Set `VITE_API_URL` to your
-computer's LAN IP (section 9) and rebuild. iOS needs a Mac with Xcode (`npx cap add ios`).
+The APK is created at `frontend/android/app/build/outputs/apk/debug/app-debug.apk`.
+
+PowerShell equivalent of step 2: `$env:CAP_DEV = '1'; npm run android:sync`.
+
+Install it on a phone with USB debugging switched on:
+
+```bash
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+Or open `frontend/android` in Android Studio (`npx cap open android`) and press Run.
+Alternatively copy the APK to the phone and open it (allow "install unknown apps" when asked).
+
+If Google Play Protect warns about a sensitive permission, that is expected for an app that can
+read messages and is installed outside the Play Store.
+
+### 10.4 Things to know
+
+- Reading messages is a restricted permission on Google Play: publishing there requires a
+  declaration and approval. For personal use, installing the APK yourself is fine.
+- iPhone does not allow apps to read messages at all. Use **Paste a bank SMS** in the add-expense
+  sheet, or the planned bank connection.
+- Bank message wording varies. If a message from your bank is not recognised, the patterns live in
+  `frontend/src/features/expenses/smsParser.ts` with tests in `smsParser.test.ts`; add a
+  sample (with account numbers removed) and a pattern.
+- After changing web code, run step 2 again and rebuild.
+- iOS (`npx cap add ios`) needs a Mac with Xcode.
 
 ## 11. Troubleshooting
 
@@ -201,6 +264,11 @@ computer's LAN IP (section 9) and rebuild. iOS needs a Mac with Xcode (`npx cap 
 | Browser shows a network error or CORS error | API not running, wrong `VITE_API_URL`, or your origin is not in `CORS_ORIGINS`. |
 | Port 8080 or 5173 already in use | Stop the other program, or use `SERVER_PORT=8081` for the API and `npm run dev -- --port 5180` for the app (add the new origin to `CORS_ORIGINS`). |
 | `npm install` fails with peer dependency errors | Use Node 22 or newer and delete `frontend/node_modules` and `frontend/package-lock.json` only as a last resort. |
+| `Downloading ... gradle ... failed: timeout` | Slow or filtered network. The wrapper timeout is already 120 s; download `gradle-8.14.3-bin.zip` yourself and run it directly, or retry. |
+| `error: invalid source release: 21` | Gradle is running on an older JDK. Set `JAVA_HOME` to JDK 21. |
+| `SDK location not found` | Set `ANDROID_HOME`, or create `frontend/android/local.properties` containing `sdk.dir=C:\\path\\to\\Android\\Sdk`. |
+| App opens but every request fails | The app was built with the wrong `VITE_API_URL`, `CAP_DEV=1` was missing, or the API/firewall is not reachable from the phone. |
+| Scan says permission denied | Phone settings, Apps, Daily Assistant, Permissions, allow SMS. Newer Android versions may hide it for sideloaded apps: under the app's three-dot menu choose "Allow restricted settings" first. |
 | Page shows old data after switching accounts | Hard refresh (Ctrl+Shift+R), or sign out and in. |
 
 ### On a company network with SSL inspection

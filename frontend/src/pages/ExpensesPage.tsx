@@ -14,7 +14,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react'
-import { add, chevronBack, chevronForward, walletOutline } from 'ionicons/icons'
+import { add, chevronBack, chevronForward, mailUnreadOutline, walletOutline } from 'ionicons/icons'
 import type { CategorySummary, Expense } from '../api/types'
 import DailyChart from '../components/DailyChart'
 import EmptyState from '../components/EmptyState'
@@ -79,6 +79,10 @@ export default function ExpensesPage() {
         <IonToolbar>
           <IonTitle>Spending</IonTitle>
           <IonButtons slot="end">
+            <IonButton routerLink="/expenses/sms" aria-label="Import from SMS">
+              <IonIcon slot="start" icon={mailUnreadOutline} />
+              SMS
+            </IonButton>
             <IonButton routerLink="/budgets" aria-label="Budgets">
               <IonIcon slot="start" icon={walletOutline} />
               Budgets

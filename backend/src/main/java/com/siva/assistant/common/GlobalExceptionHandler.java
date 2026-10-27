@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -43,6 +44,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
     public ResponseEntity<ApiError> handleBadInput(Exception ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, "Malformed request", request);
+    }
+
+    /** Two requests racing past a duplicate check end up here; the database constraint wins. */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleConflict(DataIntegrityViolationException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, "That conflicts with existing data", request);
     }
 
     @ExceptionHandler(Exception.class)
