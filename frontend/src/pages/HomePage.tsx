@@ -1,10 +1,11 @@
 import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react'
-import { personCircleOutline, sparklesOutline } from 'ionicons/icons'
+import { notificationsOutline, personCircleOutline, sparklesOutline } from 'ionicons/icons'
 import { Link } from 'react-router-dom'
 import { formatMoney } from '../features/expenses/money'
 import { toMonthKey } from '../features/expenses/month'
 import { useSummary } from '../features/expenses/useExpenses'
 import { daysUntil, isExpiringSoon } from '../features/pantry/expiry'
+import { useNotificationFeed } from '../features/notifications/useNotifications'
 import { useOpenTasks } from '../features/tasks/useTasks'
 import { usePantry } from '../features/pantry/usePantry'
 import { useProfile } from '../features/profile/useProfile'
@@ -28,6 +29,7 @@ export default function HomePage() {
   const overBudget = summary.data?.byCategory.filter((c) => c.status === 'OVER').length ?? 0
   const nearBudget = summary.data?.byCategory.filter((c) => c.status === 'NEAR').length ?? 0
 
+  const unread = useNotificationFeed().data?.unread ?? 0
   const tasks = useOpenTasks()
   const overdueTasks = tasks.data?.filter((t) => t.dueDate && daysUntil(t.dueDate) < 0).length ?? 0
   const dueToday = tasks.data?.filter((t) => t.dueDate && daysUntil(t.dueDate) === 0).length ?? 0
@@ -41,6 +43,14 @@ export default function HomePage() {
         <IonToolbar>
           <IonTitle>Daily Assistant</IonTitle>
           <IonButtons slot="end">
+            <IonButton
+              routerLink="/notifications"
+              aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
+              style={{ position: 'relative' }}
+            >
+              <IonIcon slot="icon-only" icon={notificationsOutline} />
+              {unread > 0 && <span className="bell-badge">{unread > 9 ? '9+' : unread}</span>}
+            </IonButton>
             <IonButton routerLink="/profile" aria-label="Profile and settings">
               <IonIcon slot="icon-only" icon={personCircleOutline} />
             </IonButton>

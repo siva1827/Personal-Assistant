@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { IonButton, IonInput, IonSpinner, IonText } from '@ionic/react'
-import { useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
 import { useAuth } from '../auth/useAuth'
 
 export default function LoginPage() {
   const { login } = useAuth()
-  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -17,7 +15,6 @@ export default function LoginPage() {
     setError(null)
     try {
       await login(email, password)
-      navigate('/home', { replace: true })
     } catch {
       setError('Invalid email or password')
     } finally {

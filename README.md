@@ -70,13 +70,13 @@ npx cap sync
 
 Done: monorepo skeleton, Flyway schema and seed data, register/login/refresh and `GET/PATCH /users/me` with JWT, ingredient search, day themes, pantry CRUD (single, bulk, expiring), recipe history/detail/delete, favorites, and the matching screens (login, register, pantry with editing, recipes, recipe detail, profile) with session restore, CI.
 
-Phase 2: expense categories (defaults created per user), expenses with quick-add, a bank-SMS paste parser, monthly summary with a daily chart, per-category monthly budgets with OK / near / over status, a shopping list (including a recipe's missing ingredients), and the Spending, Budgets and Shopping screens. Still to do: automatic SMS reading on Android (Capacitor plugin) and the budget alert job.
+Phase 2: expense categories (defaults created per user), expenses with quick-add, a bank-SMS paste parser, monthly summary with a daily chart, per-category monthly budgets with OK / near / over status, a shopping list (including a recipe's missing ingredients), and the Spending, Budgets and Shopping screens. Still to do: automatic SMS reading on Android (Capacitor plugin).
 
-Phase 3 (started): tasks with due dates and a Tasks tab. Still to do: push reminders, recurring tasks, Account Aggregator sandbox demo.
+Phase 3: tasks with due dates, daily/weekly/monthly repeating tasks (completing one creates the next), and a notification centre. A scheduled job creates reminders for tasks due or overdue, budgets near or over their limit, and pantry items about to expire; they show under the bell on Home, with optional device alerts while the app is open. Still to do: push messages when the app is closed (needs a Firebase project), Account Aggregator sandbox demo.
 
 On hold: the AI provider integration (`POST /recipes/suggest`, prompt builder, validator). Recipes are read from the database, so this plugs in without changing the existing endpoints.
 
-Next: reminders for tasks, the Android SMS reader, then the AI suggestions when you are ready.
+Next: push messages via Firebase, the Android SMS reader, then the AI suggestions when you are ready.
 
 ## Running the tests
 

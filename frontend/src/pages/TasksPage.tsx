@@ -11,12 +11,15 @@ import {
   IonPage,
   IonSegment,
   IonSegmentButton,
+  IonSelect,
+  IonSelectOption,
   IonText,
   IonTitle,
   IonToolbar,
 } from '@ionic/react'
 import { addOutline, trashOutline } from 'ionicons/icons'
 import { isAxiosError } from 'axios'
+import type { Recurrence } from '../api/types'
 import EmptyState from '../components/EmptyState'
 import ListSkeleton from '../components/ListSkeleton'
 import { formatMoney } from '../features/expenses/money'
@@ -31,6 +34,13 @@ import { estimatedTotal } from '../features/shopping/totals'
 import { dueInfo } from '../features/tasks/dueLabel'
 import { useCreateTask, useDeleteTask, useDoneTasks, useOpenTasks, useUpdateTask } from '../features/tasks/useTasks'
 
+const REPEAT_OPTIONS: { value: Recurrence; label: string }[] = [
+  { value: 'NONE', label: 'Does not repeat' },
+  { value: 'DAILY', label: 'Every day' },
+  { value: 'WEEKLY', label: 'Every week' },
+  { value: 'MONTHLY', label: 'Every month' },
+]
+
 function TodoList() {
   const open = useOpenTasks()
   const [showDone, setShowDone] = useState(false)
@@ -40,16 +50,18 @@ function TodoList() {
   const remove = useDeleteTask()
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
+  const [recurrence, setRecurrence] = useState<Recurrence>('NONE')
 
   const add = () => {
     const text = title.trim()
     if (!text) return
     create.mutate(
-      { title: text, dueDate: dueDate || undefined },
+      { title: text, dueDate: dueDate || undefined, recurrence: dueDate ? recurrence : undefined },
       {
         onSuccess: () => {
           setTitle('')
           setDueDate('')
+          setRecurrence('NONE')
         },
       },
     )
@@ -80,13 +92,33 @@ function TodoList() {
             fill="outline"
             type="date"
             value={dueDate}
-            onIonInput={(e) => setDueDate(String(e.detail.value ?? ''))}
+            onIonInput={(e) => {
+              const value = String(e.detail.value ?? '')
+              setDueDate(value)
+              if (!value) setRecurrence('NONE')
+            }}
           />
           <IonButton type="submit" disabled={!title.trim() || create.isPending}>
             <IonIcon slot="start" icon={addOutline} />
             Add
           </IonButton>
         </div>
+        <IonSelect
+          label="Repeat"
+          labelPlacement="stacked"
+          fill="outline"
+          style={{ marginTop: 12 }}
+          disabled={!dueDate}
+          value={recurrence}
+          placeholder={dueDate ? undefined : 'Pick a due date to repeat'}
+          onIonChange={(e) => setRecurrence(e.detail.value as Recurrence)}
+        >
+          {REPEAT_OPTIONS.map((o) => (
+            <IonSelectOption key={o.value} value={o.value}>
+              {o.label}
+            </IonSelectOption>
+          ))}
+        </IonSelect>
         {create.isError && (
           <IonText color="danger">
             <p role="alert">Could not add the task.</p>
@@ -116,7 +148,10 @@ function TodoList() {
                   aria-label={`Mark ${task.title} as done`}
                   onIonChange={() => update.mutate({ id: task.id, status: 'DONE' })}
                 />
-                <IonLabel className="ion-text-wrap">{task.title}</IonLabel>
+                <IonLabel className="ion-text-wrap">
+                  {task.title}
+                  {task.recurrence !== 'NONE' && <p>↻ Repeats {task.recurrence.toLowerCase()}</p>}
+                </IonLabel>
                 {due && (
                   <span
                     slot="end"

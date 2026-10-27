@@ -10,7 +10,11 @@ public final class TaskDtos {
     private TaskDtos() {
     }
 
-    public record CreateTaskRequest(@NotBlank @Size(max = 200) String title, LocalDate dueDate) {
+    /** A repeating task needs a due date to repeat from. */
+    public record CreateTaskRequest(
+            @NotBlank @Size(max = 200) String title,
+            LocalDate dueDate,
+            Recurrence recurrence) {
     }
 
     /** Fields left null are not changed; set clearDueDate to remove the due date. */
@@ -18,6 +22,7 @@ public final class TaskDtos {
             @Size(min = 1, max = 200) String title,
             LocalDate dueDate,
             Boolean clearDueDate,
+            Recurrence recurrence,
             TaskStatus status) {
     }
 
@@ -25,12 +30,13 @@ public final class TaskDtos {
             Long id,
             String title,
             LocalDate dueDate,
+            Recurrence recurrence,
             TaskStatus status,
             Long linkedRecipeId,
             Instant completedAt) {
 
         static TaskResponse from(Task t) {
-            return new TaskResponse(t.getId(), t.getTitle(), t.getDueDate(), t.getStatus(),
+            return new TaskResponse(t.getId(), t.getTitle(), t.getDueDate(), t.getRecurrence(), t.getStatus(),
                     t.getLinkedRecipeId(), t.getCompletedAt());
         }
     }

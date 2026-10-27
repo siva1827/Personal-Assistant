@@ -7,7 +7,10 @@ import {
   restaurantOutline,
 } from 'ionicons/icons'
 import { Navigate, Route } from 'react-router-dom'
+import { useDeviceAlerts } from './features/notifications/deviceAlerts'
+import { useNotificationFeed } from './features/notifications/useNotifications'
 import BudgetsPage from './pages/BudgetsPage'
+import NotificationsPage from './pages/NotificationsPage'
 import ExpensesPage from './pages/ExpensesPage'
 import HomePage from './pages/HomePage'
 import PantryPage from './pages/PantryPage'
@@ -17,6 +20,10 @@ import RecipesPage from './pages/RecipesPage'
 import TasksPage from './pages/TasksPage'
 
 export default function AppTabs() {
+  // Keeps the notification feed fresh app-wide and shows device alerts for new items
+  const feed = useNotificationFeed()
+  useDeviceAlerts(feed.data?.items)
+
   return (
     <IonTabs>
       <IonRouterOutlet>
@@ -27,7 +34,11 @@ export default function AppTabs() {
         <Route path="/expenses" element={<ExpensesPage />} />
         <Route path="/budgets" element={<BudgetsPage />} />
         <Route path="/tasks" element={<TasksPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        {/* After signing in or registering the URL is still /login or /register */}
+        <Route path="/login" element={<Navigate to="/home" replace />} />
+        <Route path="/register" element={<Navigate to="/home" replace />} />
         <Route path="/" element={<Navigate to="/home" replace />} />
       </IonRouterOutlet>
       <IonTabBar slot="bottom">

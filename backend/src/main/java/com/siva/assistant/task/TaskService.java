@@ -4,7 +4,9 @@ import com.siva.assistant.common.ApiException;
 import com.siva.assistant.task.TaskDtos.CreateTaskRequest;
 import com.siva.assistant.task.TaskDtos.TaskResponse;
 import com.siva.assistant.task.TaskDtos.UpdateTaskRequest;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -18,9 +20,11 @@ public class TaskService {
     static final int DONE_LIMIT = 50;
 
     private final TaskRepository tasks;
+    private final Clock clock;
 
-    public TaskService(TaskRepository tasks) {
+    public TaskService(TaskRepository tasks, Clock clock) {
         this.tasks = tasks;
+        this.clock = clock;
     }
 
     @Transactional(readOnly = true)
@@ -34,30 +38,38 @@ public class TaskService {
 
     @Transactional
     public TaskResponse create(long userId, CreateTaskRequest request) {
-        String title = request.title().trim();
-        if (title.isEmpty()) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "title must not be blank");
-        }
-        return TaskResponse.from(tasks.save(new Task(userId, title, request.dueDate())));
+        String title = cleanTitle(request.title());
+        Recurrence recurrence = request.recurrence() == null ? Recurrence.NONE : request.recurrence();
+        requireDueDateForRecurrence(recurrence, request.dueDate());
+        return TaskResponse.from(tasks.save(new Task(userId, title, request.dueDate(), recurrence)));
     }
 
+    /**
+     * Completing a repeating task also creates its next occurrence, so the series carries on.
+     * Completing an already finished task changes nothing, so a double tap cannot add two copies.
+     */
     @Transactional
-    public TaskResponse update(long userId, long taskId, UpdateTaskRequest request, Instant now) {
+    public TaskResponse update(long userId, long taskId, UpdateTaskRequest request) {
         Task task = find(userId, taskId);
         if (request.title() != null) {
-            String title = request.title().trim();
-            if (title.isEmpty()) {
-                throw new ApiException(HttpStatus.BAD_REQUEST, "title must not be blank");
-            }
-            task.setTitle(title);
+            task.setTitle(cleanTitle(request.title()));
         }
         if (Boolean.TRUE.equals(request.clearDueDate())) {
             task.setDueDate(null);
         } else if (request.dueDate() != null) {
             task.setDueDate(request.dueDate());
         }
+        if (request.recurrence() != null) {
+            task.setRecurrence(request.recurrence());
+        }
+        requireDueDateForRecurrence(task.getRecurrence(), task.getDueDate());
+
         if (request.status() != null) {
-            task.setStatus(request.status(), now);
+            boolean completing = request.status() == TaskStatus.DONE && task.getStatus() == TaskStatus.OPEN;
+            task.setStatus(request.status(), Instant.now(clock));
+            if (completing) {
+                createNextOccurrence(task);
+            }
         }
         return TaskResponse.from(task);
     }
@@ -65,6 +77,28 @@ public class TaskService {
     @Transactional
     public void delete(long userId, long taskId) {
         tasks.delete(find(userId, taskId));
+    }
+
+    private void createNextOccurrence(Task done) {
+        if (done.getRecurrence() == Recurrence.NONE || done.getDueDate() == null) {
+            return;
+        }
+        LocalDate next = done.getRecurrence().nextDue(done.getDueDate(), LocalDate.now(clock));
+        tasks.save(new Task(done.getUserId(), done.getTitle(), next, done.getRecurrence()));
+    }
+
+    private static void requireDueDateForRecurrence(Recurrence recurrence, LocalDate dueDate) {
+        if (recurrence != Recurrence.NONE && dueDate == null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "A repeating task needs a due date");
+        }
+    }
+
+    private static String cleanTitle(String raw) {
+        String title = raw.trim();
+        if (title.isEmpty()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "title must not be blank");
+        }
+        return title;
     }
 
     private Task find(long userId, long taskId) {

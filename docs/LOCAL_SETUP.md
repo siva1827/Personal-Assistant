@@ -111,6 +111,14 @@ Defaults you can leave alone: `DB_URL=jdbc:mysql://localhost:3306/assistant`, `D
 port `8080`. Override any of them with environment variables of the same name
 (`DB_URL`, `DB_USER`, `DB_PASSWORD`, `SERVER_PORT`).
 
+Two more optional settings:
+
+- `APP_TIMEZONE` (default `Asia/Kolkata`): decides what "today" means for due dates, budgets and
+  reminders. Set it to your own zone, for example `Europe/London`.
+- `NOTIFICATION_INTERVAL` (default `PT30M`): how often reminders are generated for all users.
+  Reminders are also refreshed whenever the app loads them, so this mostly matters for the
+  future push messages.
+
 Success looks like `Started AssistantApplication in ... seconds`. Check it:
 open http://localhost:8080/swagger-ui.html.
 
@@ -139,8 +147,9 @@ The app follows your operating system's light or dark mode.
 1. Register, sign out, sign in again, reload the page (you should stay signed in).
 2. **Pantry:** search "tom", tap a result to add it, tap the item to set quantity and expiry.
 3. **Spending:** tap **+**, enter an amount, pick a category, save. Open **Budgets** and set a limit.
-4. **Tasks:** add a task with a due date, tick it off; switch to **Shopping list** and add an item.
-5. **Recipes** will be empty: AI recipe suggestions are not switched on yet.
+4. **Tasks:** add a task with a due date, tick it off; make one repeat weekly and tick it off to see the next one appear. Switch to **Shopping list** and add an item.
+5. **Notifications:** tap the bell on Home. A task due today, a budget near its limit or food about to expire shows up there. Profile has an optional **Device alerts** switch.
+6. **Recipes** will be empty: AI recipe suggestions are not switched on yet.
 
 ## 8. Run the tests
 

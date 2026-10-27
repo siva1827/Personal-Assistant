@@ -29,6 +29,10 @@ public class Task {
     @Column(name = "due_date")
     private LocalDate dueDate;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Recurrence recurrence = Recurrence.NONE;
+
     @Column(name = "reminder_at")
     private Instant reminderAt;
 
@@ -50,9 +54,14 @@ public class Task {
     }
 
     public Task(Long userId, String title, LocalDate dueDate) {
+        this(userId, title, dueDate, Recurrence.NONE);
+    }
+
+    public Task(Long userId, String title, LocalDate dueDate, Recurrence recurrence) {
         this.userId = userId;
         this.title = title;
         this.dueDate = dueDate;
+        this.recurrence = recurrence;
     }
 
     public Long getId() {
@@ -77,6 +86,14 @@ public class Task {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public Recurrence getRecurrence() {
+        return recurrence;
+    }
+
+    public void setRecurrence(Recurrence recurrence) {
+        this.recurrence = recurrence;
     }
 
     public TaskStatus getStatus() {

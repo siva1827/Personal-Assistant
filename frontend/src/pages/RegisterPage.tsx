@@ -1,13 +1,11 @@
 import { useState } from 'react'
 import { IonButton, IonInput, IonSpinner, IonText } from '@ionic/react'
 import { isAxiosError } from 'axios'
-import { useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
 import { useAuth } from '../auth/useAuth'
 
 export default function RegisterPage() {
   const { register } = useAuth()
-  const navigate = useNavigate()
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -19,7 +17,6 @@ export default function RegisterPage() {
     setError(null)
     try {
       await register(email, password, displayName)
-      navigate('/home', { replace: true })
     } catch (e) {
       const status = isAxiosError(e) ? e.response?.status : undefined
       setError(status === 409 ? 'That email is already registered' : 'Could not create account. Check your details.')

@@ -141,10 +141,13 @@ export interface Budget {
   limitAmount: number
 }
 
+export type Recurrence = 'NONE' | 'DAILY' | 'WEEKLY' | 'MONTHLY'
+
 export interface Task {
   id: number
   title: string
   dueDate: string | null
+  recurrence: Recurrence
   status: 'OPEN' | 'DONE'
   linkedRecipeId: number | null
   completedAt: string | null
@@ -161,4 +164,21 @@ export interface ShoppingItem {
 export interface AddedFromRecipe {
   added: ShoppingItem[]
   skipped: number
+}
+
+export type NotificationType = 'TASK_DUE' | 'TASK_OVERDUE' | 'BUDGET_NEAR' | 'BUDGET_OVER' | 'PANTRY_EXPIRING'
+
+export interface AppNotification {
+  id: number
+  type: NotificationType
+  title: string
+  body: string
+  link: string | null
+  read: boolean
+  createdAt: string
+}
+
+export interface NotificationFeed {
+  unread: number
+  items: AppNotification[]
 }

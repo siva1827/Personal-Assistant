@@ -6,15 +6,20 @@ import {
   IonContent,
   IonHeader,
   IonInput,
+  IonItem,
+  IonLabel,
   IonPage,
   IonSelect,
   IonSelectOption,
   IonText,
   IonTitle,
+  IonToggle,
   IonToolbar,
 } from '@ionic/react'
 import type { DietaryPreference, UserProfile } from '../api/types'
 import { useAuth } from '../auth/useAuth'
+import { alertsEnabled, alertsSupported, setAlertsEnabled } from '../features/notifications/deviceAlerts'
+import { useNotificationFeed } from '../features/notifications/useNotifications'
 import { parseAllergies, useProfile, useUpdateProfile } from '../features/profile/useProfile'
 
 const DIETS: { value: DietaryPreference; label: string }[] = [
@@ -87,6 +92,53 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
   )
 }
 
+function DeviceAlertsCard() {
+  const feed = useNotificationFeed()
+  const [on, setOn] = useState(alertsEnabled())
+  const [denied, setDenied] = useState(false)
+
+  if (!alertsSupported()) {
+    return (
+      <div className="card">
+        <strong>Device alerts</strong>
+        <p className="muted" style={{ marginBottom: 0 }}>
+          This browser does not support system notifications. Reminders still appear under the bell.
+        </p>
+      </div>
+    )
+  }
+
+  const toggle = async (next: boolean) => {
+    const ok = await setAlertsEnabled(next, feed.data?.items)
+    setDenied(next && !ok)
+    setOn(next && ok)
+  }
+
+  return (
+    <div className="card">
+      <IonItem lines="none" style={{ '--padding-start': '0px', '--inner-padding-end': '0px' }}>
+        <IonLabel className="ion-text-wrap">
+          <h3>Device alerts</h3>
+          <p>Show a system notification for new reminders while the app is open.</p>
+        </IonLabel>
+        <IonToggle
+          slot="end"
+          aria-label="Device alerts"
+          checked={on}
+          onIonChange={(e) => void toggle(e.detail.checked)}
+        />
+      </IonItem>
+      {denied && (
+        <IonText color="danger">
+          <p role="alert" style={{ margin: '8px 0 0' }}>
+            Notifications are blocked for this site. Allow them in your browser settings, then try again.
+          </p>
+        </IonText>
+      )}
+    </div>
+  )
+}
+
 export default function ProfilePage() {
   const profile = useProfile()
   const { logout } = useAuth()
@@ -108,6 +160,7 @@ export default function ProfilePage() {
           </div>
         )}
         {profile.data && <ProfileForm profile={profile.data} />}
+        <DeviceAlertsCard />
         <IonButton expand="block" fill="outline" color="danger" onClick={logout}>
           Sign out
         </IonButton>

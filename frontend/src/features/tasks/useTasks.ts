@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createTask, deleteTask, listTasks, updateTask } from '../../api/tasks'
+import type { Recurrence } from '../../api/types'
 
 export const useOpenTasks = () => useQuery({ queryKey: ['tasks', 'OPEN'], queryFn: () => listTasks('OPEN') })
 
@@ -14,7 +15,8 @@ function useInvalidateTasks() {
 export const useCreateTask = () => {
   const invalidate = useInvalidateTasks()
   return useMutation({
-    mutationFn: ({ title, dueDate }: { title: string; dueDate?: string }) => createTask(title, dueDate),
+    mutationFn: ({ title, dueDate, recurrence }: { title: string; dueDate?: string; recurrence?: Recurrence }) =>
+      createTask(title, dueDate, recurrence),
     onSuccess: invalidate,
   })
 }

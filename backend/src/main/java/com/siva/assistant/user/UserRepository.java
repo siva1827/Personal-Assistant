@@ -8,4 +8,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
+
+    @org.springframework.data.jpa.repository.Query("select u.id from User u")
+    java.util.List<Long> findAllIds();
 }

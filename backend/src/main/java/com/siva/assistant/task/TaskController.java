@@ -4,7 +4,6 @@ import com.siva.assistant.task.TaskDtos.CreateTaskRequest;
 import com.siva.assistant.task.TaskDtos.TaskResponse;
 import com.siva.assistant.task.TaskDtos.UpdateTaskRequest;
 import jakarta.validation.Valid;
-import java.time.Instant;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,7 +43,7 @@ public class TaskController {
     @PatchMapping("/{id}")
     public TaskResponse update(@AuthenticationPrincipal Long userId, @PathVariable Long id,
                                @Valid @RequestBody UpdateTaskRequest request) {
-        return taskService.update(userId, id, request, Instant.now());
+        return taskService.update(userId, id, request);
     }
 
     @DeleteMapping("/{id}")

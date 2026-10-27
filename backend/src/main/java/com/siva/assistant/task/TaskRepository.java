@@ -19,5 +19,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             """)
     List<Task> findOpen(@Param("userId") Long userId);
 
+    /** Open tasks due on or before the date, for reminders. */
+    List<Task> findByUserIdAndStatusAndDueDateLessThanEqual(Long userId, TaskStatus status, java.time.LocalDate date);
+
     List<Task> findByUserIdAndStatusOrderByCompletedAtDescIdDesc(Long userId, TaskStatus status, Pageable pageable);
 }
