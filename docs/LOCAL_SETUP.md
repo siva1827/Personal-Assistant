@@ -201,7 +201,7 @@ committed in `frontend/android`.
 | --- | --- | --- |
 | JDK | **21** | Capacitor 8 needs 21 for Android builds (the backend runs fine on 21 too) |
 | Android SDK | platform 36, build-tools 35 and 36 | easiest via Android Studio; or the command-line tools |
-| Gradle | 8.14 | downloaded automatically by `./gradlew` on first use |
+| Gradle | 8.14 or newer | install it yourself (https://gradle.org/install); see the note in 10.3 about the wrapper |
 
 Set `JAVA_HOME` to JDK 21 and `ANDROID_HOME` to your SDK folder (Android Studio shows it under
 Settings, Languages & Frameworks, Android SDK). The first build downloads several hundred MB.
@@ -219,12 +219,19 @@ echo "VITE_API_URL=http://192.168.1.20:8080/api/v1" > .env.local
 # 2. Build the web app and copy it into the Android project
 #    CAP_DEV=1 allows plain http to your computer; never use it for a release build
 CAP_DEV=1 npm run android:sync
-# 3. Build the APK
+# 3. Build the APK (needs Gradle 8.14+ on your PATH, and JAVA_HOME pointing at JDK 21)
 cd android
-./gradlew assembleDebug            # Windows: gradlew.bat assembleDebug
+gradle assembleDebug
 ```
 
 The APK is created at `frontend/android/app/build/outputs/apk/debug/app-debug.apk`.
+
+> **About the Gradle wrapper.** `gradlew` (the script) and `gradle/wrapper/gradle-wrapper.jar` are not in
+> this repository: the network it was created on blocked uploading them. That is why step 3 uses a
+> normally installed `gradle`. If you prefer the wrapper, run `gradle wrapper --gradle-version 8.14.3`
+> once inside `frontend/android` to generate it (this resets the download timeout in
+> `gradle/wrapper/gradle-wrapper.properties`, so raise `networkTimeout` back to `120000` on a slow
+> connection). Android Studio does not need the wrapper jar.
 
 PowerShell equivalent of step 2: `$env:CAP_DEV = '1'; npm run android:sync`.
 
@@ -264,7 +271,7 @@ read messages and is installed outside the Play Store.
 | Browser shows a network error or CORS error | API not running, wrong `VITE_API_URL`, or your origin is not in `CORS_ORIGINS`. |
 | Port 8080 or 5173 already in use | Stop the other program, or use `SERVER_PORT=8081` for the API and `npm run dev -- --port 5180` for the app (add the new origin to `CORS_ORIGINS`). |
 | `npm install` fails with peer dependency errors | Use Node 22 or newer and delete `frontend/node_modules` and `frontend/package-lock.json` only as a last resort. |
-| `Downloading ... gradle ... failed: timeout` | Slow or filtered network. The wrapper timeout is already 120 s; download `gradle-8.14.3-bin.zip` yourself and run it directly, or retry. |
+| `Downloading ... gradle ... failed: timeout` | Only if you generated the wrapper: raise `networkTimeout` in `gradle/wrapper/gradle-wrapper.properties`, or just use an installed `gradle`. |
 | `error: invalid source release: 21` | Gradle is running on an older JDK. Set `JAVA_HOME` to JDK 21. |
 | `SDK location not found` | Set `ANDROID_HOME`, or create `frontend/android/local.properties` containing `sdk.dir=C:\\path\\to\\Android\\Sdk`. |
 | App opens but every request fails | The app was built with the wrong `VITE_API_URL`, `CAP_DEV=1` was missing, or the API/firewall is not reachable from the phone. |
