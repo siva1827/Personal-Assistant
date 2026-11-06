@@ -35,6 +35,11 @@ app:
       model: ${GEMINI_MODEL:gemini-2.5-flash}
       base-url: https://generativelanguage.googleapis.com
       timeout-seconds: 60
+  aa:
+    # none = bank connect off; mock = built-in demo that invents accounts and transactions
+    provider: ${AA_PROVIDER:none}
+    consent-days: ${AA_CONSENT_DAYS:30}
+    history-days: ${AA_HISTORY_DAYS:90}
   firebase:
     # Push messages are off unless one of these is set (see docs/FIREBASE_SETUP.md).
     # A service-account key file path, or the JSON itself for hosts where files are awkward.

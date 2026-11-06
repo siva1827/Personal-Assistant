@@ -202,3 +202,44 @@ export interface SuggestionResponse {
   filteredOut: number
   model: string
 }
+
+export interface AaStatus {
+  /** False when the server has no Account Aggregator provider set up */
+  configured: boolean
+  /** True for the built-in demo provider, which invents accounts and transactions */
+  mock: boolean
+  provider: string
+}
+
+export type ConsentStatus = 'PENDING' | 'ACTIVE' | 'REJECTED' | 'REVOKED' | 'EXPIRED'
+
+export interface BankAccount {
+  id: number
+  bankName: string
+  maskedNumber: string
+  accountType: string
+  balance: number | null
+  balanceAt: string | null
+}
+
+export interface BankConsent {
+  id: number
+  status: ConsentStatus
+  purpose: string
+  dataFrom: string
+  dataTo: string
+  createdAt: string
+  approvedAt: string | null
+  expiresAt: string | null
+  lastSyncedAt: string | null
+  /** Where a real provider sends the user to approve; only present right after creating */
+  redirectUrl: string | null
+  accounts: BankAccount[]
+}
+
+export interface BankSyncResult {
+  imported: number
+  skipped: number
+  creditsIgnored: number
+  accounts: BankAccount[]
+}

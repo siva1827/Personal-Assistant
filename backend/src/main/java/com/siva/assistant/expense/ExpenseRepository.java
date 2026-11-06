@@ -23,6 +23,11 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     boolean existsByUserIdAndExternalRef(Long userId, String externalRef);
 
+    /** Which of the given import fingerprints this user already has; one query for a whole batch. */
+    @Query("select e.externalRef from Expense e where e.userId = :userId and e.externalRef in :refs")
+    List<String> findExistingExternalRefs(@Param("userId") Long userId,
+                                          @Param("refs") java.util.Collection<String> refs);
+
     @Query("""
             select new com.siva.assistant.expense.CategoryTotal(e.category.id, sum(e.amount))
             from Expense e

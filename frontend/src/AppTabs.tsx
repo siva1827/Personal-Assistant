@@ -10,6 +10,7 @@ import { Navigate, Route } from 'react-router-dom'
 import { useDeviceAlerts } from './features/notifications/deviceAlerts'
 import { useNotificationFeed } from './features/notifications/useNotifications'
 import { usePushSync } from './features/push/push'
+import BankPage from './pages/BankPage'
 import BudgetsPage from './pages/BudgetsPage'
 import NotificationsPage from './pages/NotificationsPage'
 import ExpensesPage from './pages/ExpensesPage'
@@ -39,6 +40,7 @@ export default function AppTabs() {
         <Route path="/expenses" element={<ExpensesPage />} />
         <Route path="/budgets" element={<BudgetsPage />} />
         <Route path="/expenses/sms" element={<SmsImportPage />} />
+        <Route path="/expenses/bank" element={<BankPage />} />
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/profile" element={<ProfilePage />} />

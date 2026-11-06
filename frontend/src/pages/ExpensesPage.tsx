@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import {
   IonButton,
-  IonButtons,
   IonContent,
   IonFab,
   IonFabButton,
@@ -14,7 +13,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react'
-import { add, chevronBack, chevronForward, mailUnreadOutline, walletOutline } from 'ionicons/icons'
+import { add, businessOutline, chevronBack, chevronForward, mailUnreadOutline, walletOutline } from 'ionicons/icons'
 import type { CategorySummary, Expense } from '../api/types'
 import DailyChart from '../components/DailyChart'
 import EmptyState from '../components/EmptyState'
@@ -78,19 +77,24 @@ export default function ExpensesPage() {
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonTitle>Spending</IonTitle>
-          <IonButtons slot="end">
-            <IonButton routerLink="/expenses/sms" aria-label="Import from SMS">
-              <IonIcon slot="start" icon={mailUnreadOutline} />
-              SMS
-            </IonButton>
-            <IonButton routerLink="/budgets" aria-label="Budgets">
-              <IonIcon slot="start" icon={walletOutline} />
-              Budgets
-            </IonButton>
-          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent className="app-content">
+        <div className="chip-row" aria-label="Spending tools" style={{ margin: '4px 0 6px' }}>
+          <IonButton size="small" fill="outline" routerLink="/expenses/bank">
+            <IonIcon slot="start" icon={businessOutline} />
+            Bank connect
+          </IonButton>
+          <IonButton size="small" fill="outline" routerLink="/expenses/sms">
+            <IonIcon slot="start" icon={mailUnreadOutline} />
+            SMS import
+          </IonButton>
+          <IonButton size="small" fill="outline" routerLink="/budgets">
+            <IonIcon slot="start" icon={walletOutline} />
+            Budgets
+          </IonButton>
+        </div>
+
         <div className="month-switcher">
           <IonButton fill="clear" aria-label="Previous month" onClick={() => setMonth(shiftMonth(month, -1))}>
             <IonIcon slot="icon-only" icon={chevronBack} />
@@ -164,6 +168,11 @@ export default function ExpensesPage() {
                         <h3>{expense.note ?? expense.categoryName}</h3>
                         {expense.note && <p>{expense.categoryName}</p>}
                       </IonLabel>
+                      {expense.source !== 'MANUAL' && (
+                        <span slot="end" className="pill" style={{ marginRight: 8 }}>
+                          {expense.source === 'SMS' ? 'SMS' : 'bank'}
+                        </span>
+                      )}
                       <span slot="end" className="money">
                         {formatMoney(expense.amount)}
                       </span>
